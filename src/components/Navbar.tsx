@@ -1,53 +1,75 @@
-'use client';
-import { useState } from 'react';
+"use client";
+import { useState } from "react";
+
+const navLinks = [
+  { label: "Find Jobs", href: "#", active: true },
+  { label: "Post a Job", href: "#", active: false },
+  { label: "Login", href: "#", active: false },
+];
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
 
   return (
-    <nav className="w-full bg-white border-b border-gray-100 px-5 py-4 relative z-50">
-      <div className="max-w-6xl mx-auto flex items-center justify-between">
-        <span className="text-[#8B1A1A] font-bold text-xl tracking-tight">FastFoodJobs</span>
+    <header className="fixed top-0 left-0 right-0 z-50 bg-surface shadow-[0px_4px_20px_rgba(29,53,87,0.05)]">
+      <nav className="flex justify-between items-center w-full px-6 max-w-[1280px] mx-auto h-14">
+        <a href="#" className="text-2xl font-extrabold text-primary tracking-tight">
+          FastFoodJobs
+        </a>
 
-        {/* Desktop menu */}
-        <div className="hidden md:flex items-center gap-8">
-          <a href="#" className="text-sm font-medium text-gray-800 border-b-2 border-[#8B1A1A] pb-0.5">Find Jobs</a>
-          <a href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900">Post a Job</a>
-          <a href="#" className="text-sm font-medium text-gray-600 hover:text-gray-900">Login</a>
-          <a href="#" className="bg-[#8B1A1A] text-white text-sm font-semibold px-5 py-2 rounded-full hover:bg-[#701515] transition-colors">
+        {/* Desktop nav */}
+        <div className="hidden md:flex items-center gap-6">
+          {navLinks.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              className={
+                link.active
+                  ? "text-sm font-semibold text-primary border-b-2 border-primary pb-1"
+                  : "text-sm font-semibold text-on-surface-variant hover:text-secondary transition-colors"
+              }
+            >
+              {link.label}
+            </a>
+          ))}
+          <button className="bg-primary text-on-primary px-6 py-2 rounded-full text-sm font-semibold hover:opacity-90 active:scale-95 transition-all">
             Apply Now
-          </a>
+          </button>
         </div>
 
-        {/* Hamburger */}
+        {/* Mobile hamburger */}
         <button
-          className="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          className="md:hidden text-primary p-1"
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
+          aria-expanded={open}
         >
-          {open ? (
-            <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          ) : (
-            <svg className="w-5 h-5 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          )}
+          <span className="material-symbols-outlined">{open ? "close" : "menu"}</span>
         </button>
-      </div>
+      </nav>
 
       {/* Mobile menu */}
       {open && (
-        <div className="md:hidden absolute top-full left-0 right-0 bg-white border-b border-gray-100 shadow-lg px-5 py-4 flex flex-col gap-4">
-          <a href="#" className="text-sm font-medium text-[#8B1A1A]">Find Jobs</a>
-          <a href="#" className="text-sm font-medium text-gray-600">Post a Job</a>
-          <a href="#" className="text-sm font-medium text-gray-600">Login</a>
-          <a href="#" className="bg-[#8B1A1A] text-white text-sm font-semibold px-5 py-3 rounded-full text-center hover:bg-[#701515] transition-colors">
+        <div className="md:hidden bg-surface border-t border-outline-variant/20 shadow-lg px-6 py-5 flex flex-col gap-5">
+          {navLinks.map((link) => (
+            <a
+              key={link.label}
+              href={link.href}
+              className={
+                link.active
+                  ? "text-sm font-semibold text-primary"
+                  : "text-sm font-semibold text-on-surface-variant"
+              }
+              onClick={() => setOpen(false)}
+            >
+              {link.label}
+            </a>
+          ))}
+          <button className="bg-primary text-on-primary px-6 py-3 rounded-full text-sm font-semibold text-center">
             Apply Now
-          </a>
+          </button>
         </div>
       )}
-    </nav>
+    </header>
   );
 }

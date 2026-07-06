@@ -1,30 +1,42 @@
+const footerLinks = ["Privacy Policy", "Terms of Service", "Contact Us", "About Us"];
+
 export default function Footer() {
   return (
-    <footer className="bg-white border-t border-gray-100 px-5 py-8">
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-        <div className="text-center md:text-left">
-          <span className="text-[#8B1A1A] font-bold text-lg">FastFoodJobs</span>
-          <p className="text-xs text-gray-400 mt-1">&copy; 2024 FastFoodJobs. All rights reserved.</p>
+    <footer className="bg-surface-container-lowest border-t border-outline-variant">
+      <div className="w-full py-12 px-6 max-w-[1280px] mx-auto flex flex-col md:flex-row justify-between items-center gap-8">
+        <div className="flex flex-col items-center md:items-start gap-1">
+          <div className="text-2xl font-extrabold text-primary tracking-tight">FastFoodJobs</div>
+          <p className="text-xs font-bold text-on-surface-variant">
+            &copy; 2024 FastFoodJobs. All rights reserved.
+          </p>
         </div>
 
-        <div className="flex items-center gap-4 sm:gap-6 flex-wrap justify-center">
-          {['Privacy Policy', 'Terms of Service', 'Contact Us', 'About Us'].map((link) => (
-            <a key={link} href="#" className="text-xs sm:text-sm text-gray-500 hover:text-gray-800 transition-colors">
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-3">
+          {footerLinks.map((link) => (
+            <a
+              key={link}
+              href="#"
+              className="text-sm font-semibold text-on-surface-variant hover:text-primary transition-all"
+            >
               {link}
             </a>
           ))}
         </div>
 
-        <div className="flex items-center gap-3">
-          <a href="#" className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors">
-            <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92-1.31-2.92-2.92-2.92z" />
-            </svg>
+        <div className="flex gap-4">
+          <a
+            href="#"
+            aria-label="Share"
+            className="w-10 h-10 bg-surface-container-high rounded-full flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all"
+          >
+            <span className="material-symbols-outlined text-[20px]">share</span>
           </a>
-          <a href="#" className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center hover:bg-gray-200 transition-colors">
-            <svg className="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 24 24">
-              <path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z" />
-            </svg>
+          <a
+            href="#"
+            aria-label="Email"
+            className="w-10 h-10 bg-surface-container-high rounded-full flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all"
+          >
+            <span className="material-symbols-outlined text-[20px]">alternate_email</span>
           </a>
         </div>
       </div>

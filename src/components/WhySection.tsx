@@ -1,70 +1,70 @@
+const CAREER_IMG =
+  "https://lh3.googleusercontent.com/aida-public/AB6AXuDZp3DqZ0awQ5Rvv3lYi7agB2M3t-zz9yhe5U7W5UrG5mZAq78gmnAcl6KV97UefO3OKZyPuJqNlYqk2Q1EHARIjt7ReZ9NPuUVyFNhxUGwur3iodJB4kJpxMws7dTHssELujfiy7AbOha8JdI8f6QbnVLJ7NKLaJBpVyYPHmF9XcAmrmsnhvN6Qz_jRiZN-ky_Jg9Jxewt3LynYoh8fQnNERS77fD0TV9PIaGw_pXmx0I0hd7fWHAG60KjZt_46K0hPZ_E_n8mBTMu";
+
 export default function WhySection() {
   return (
-    <section className="bg-[#EEF4EE] py-14 md:py-20 px-5">
-      <div className="max-w-6xl mx-auto flex flex-col md:flex-row gap-10 md:gap-12 items-start">
-
-        {/* Left */}
-        <div className="flex-1 space-y-5 text-center md:text-left">
-          <h2 className="text-3xl md:text-4xl font-bold text-gray-900">Why FastFoodJobs?</h2>
-          <p className="text-gray-600 text-base max-w-sm mx-auto md:mx-0">
-            We&apos;ve reinvented the hiring process for the hospitality industry. No more long forms or waiting weeks for a callback.
-          </p>
-          <a
-            href="#"
-            className="inline-flex items-center gap-2 bg-[#3B2A1A] text-white text-sm font-semibold px-6 py-3 rounded-full hover:bg-[#2a1e12] transition-colors"
-          >
-            Create Your Profile
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-            </svg>
-          </a>
-        </div>
-
-        {/* Right – cards */}
-        <div className="flex-1 w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {/* Quick Hiring */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm space-y-3">
-            <div className="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
-              <svg className="w-5 h-5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z" clipRule="evenodd" />
-              </svg>
-            </div>
-            <h3 className="font-bold text-gray-900">Quick Hiring</h3>
-            <p className="text-sm text-gray-500 leading-relaxed">
-              Get interviewed and hired in as little as 24 hours. Our &quot;Instant Connect&quot; feature puts you directly in touch with hiring managers.
+    <section className="py-16 md:py-20">
+      <div className="max-w-[1280px] mx-auto px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-20 items-center">
+          {/* Left */}
+          <div className="lg:col-span-5">
+            <h2 className="font-extrabold text-[32px] sm:text-[40px] lg:text-[48px] leading-[1.1] tracking-[-0.02em] text-on-surface mb-6">
+              Why FastFoodJobs?
+            </h2>
+            <p className="text-lg leading-relaxed text-on-surface-variant mb-10">
+              We&apos;ve reinvented the hiring process for the hospitality industry. No more long forms or waiting weeks for a callback.
             </p>
+            <button className="bg-secondary text-on-secondary px-8 py-4 rounded-xl text-sm font-semibold hover:brightness-110 transition-all inline-flex items-center gap-2">
+              Create Your Profile <span className="material-symbols-outlined">arrow_forward</span>
+            </button>
           </div>
 
-          {/* Flexible Shifts */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm space-y-3">
-            <div className="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
-              <svg className="w-5 h-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-              </svg>
-            </div>
-            <h3 className="font-bold text-gray-900">Flexible Shifts</h3>
-            <p className="text-sm text-gray-500 leading-relaxed">
-              Filter jobs by availability. Find early morning, late night, or weekend-only shifts that perfectly match your lifestyle.
-            </p>
-          </div>
-
-          {/* Career Growth – full width dark card */}
-          <div className="sm:col-span-2 bg-[#3D5A80] rounded-2xl p-6 shadow-sm flex flex-col sm:flex-row items-start sm:items-center gap-4">
-            <div className="flex-1 space-y-2">
-              <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center">
-                <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                </svg>
+          {/* Right – bento cards */}
+          <div className="lg:col-span-7 grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Quick Hiring */}
+            <div className="bg-white p-8 rounded-[24px] shadow-[0px_4px_20px_rgba(29,53,87,0.05)] border border-outline-variant/5 group hover:-translate-y-1 transition-transform">
+              <div className="w-14 h-14 bg-primary-fixed rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <span className="material-symbols-outlined icon-filled text-primary text-[32px]">bolt</span>
               </div>
-              <h3 className="font-bold text-white">Career Growth</h3>
-              <p className="text-sm text-blue-100 leading-relaxed">
-                Access exclusive training modules and management fast-track programs. We don&apos;t just find you a job; we help you build a career.
+              <h3 className="text-2xl font-bold leading-snug text-on-surface mb-3">Quick Hiring</h3>
+              <p className="text-base text-on-surface-variant">
+                Get interviewed and hired in as little as 24 hours. Our &quot;Instant Connect&quot; feature puts you directly in touch with hiring managers.
               </p>
             </div>
-            <div className="hidden sm:block w-28 h-20 bg-white/10 rounded-xl shrink-0"></div>
+
+            {/* Flexible Shifts */}
+            <div className="bg-white p-8 rounded-[24px] shadow-[0px_4px_20px_rgba(29,53,87,0.05)] border border-outline-variant/5 group hover:-translate-y-1 transition-transform">
+              <div className="w-14 h-14 bg-secondary-fixed rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <span className="material-symbols-outlined icon-filled text-secondary text-[32px]">calendar_today</span>
+              </div>
+              <h3 className="text-2xl font-bold leading-snug text-on-surface mb-3">Flexible Shifts</h3>
+              <p className="text-base text-on-surface-variant">
+                Filter jobs by availability. Find early morning, late night, or weekend-only shifts that perfectly match your lifestyle.
+              </p>
+            </div>
+
+            {/* Career Growth – full width */}
+            <div className="md:col-span-2 bg-tertiary-container text-on-tertiary-container p-8 rounded-[24px] shadow-[0px_4px_20px_rgba(29,53,87,0.05)] flex flex-col md:flex-row gap-8 items-center">
+              <div className="flex-1">
+                <div className="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center mb-6">
+                  <span className="material-symbols-outlined icon-filled text-white text-[32px]">trending_up</span>
+                </div>
+                <h3 className="text-2xl font-bold leading-snug mb-3">Career Growth</h3>
+                <p className="text-base opacity-90">
+                  Access exclusive training modules and management fast-track programs. We don&apos;t just find you a job; we help you build a career.
+                </p>
+              </div>
+              <div className="flex-1 w-full h-48 bg-white/10 rounded-xl overflow-hidden relative border border-white/10">
+                <img
+                  className="w-full h-full object-cover opacity-80"
+                  alt="Career progression path from team member to manager"
+                  src={CAREER_IMG}
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-tertiary-container to-transparent"></div>
+              </div>
+            </div>
           </div>
         </div>
-
       </div>
     </section>
   );
