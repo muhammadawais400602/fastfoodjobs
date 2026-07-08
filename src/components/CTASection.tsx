@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function CTASection() {
   return (
     <section className="py-16 md:py-20">
@@ -11,9 +13,12 @@ export default function CTASection() {
               Join thousands of happy workers who found their perfect match on FastFoodJobs.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4 sm:gap-6 pt-4">
-              <button className="bg-white text-primary px-10 py-4 rounded-xl text-sm font-semibold hover:bg-surface transition-all shadow-lg">
+              <Link
+                href="/jobs"
+                className="bg-white text-primary px-10 py-4 rounded-xl text-sm font-semibold hover:bg-surface transition-all shadow-lg"
+              >
                 Browse All Jobs
-              </button>
+              </Link>
               <button className="bg-transparent border-2 border-white/30 text-white px-10 py-4 rounded-xl text-sm font-semibold hover:bg-white/10 transition-all">
                 For Employers
               </button>

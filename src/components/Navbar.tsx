@@ -1,8 +1,9 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 
 const navLinks = [
-  { label: "Find Jobs", href: "#", active: true },
+  { label: "Find Jobs", href: "/jobs", active: true },
   { label: "Post a Job", href: "#", active: false },
   { label: "Login", href: "#", active: false },
 ];
@@ -13,14 +14,14 @@ export default function Navbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-surface shadow-[0px_4px_20px_rgba(29,53,87,0.05)]">
       <nav className="flex justify-between items-center w-full px-6 max-w-[1280px] mx-auto h-14">
-        <a href="#" className="text-2xl font-extrabold text-primary tracking-tight">
+        <Link href="/" className="text-2xl font-extrabold text-primary tracking-tight">
           FastFoodJobs
-        </a>
+        </Link>
 
         {/* Desktop nav */}
         <div className="hidden md:flex items-center gap-6">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.label}
               href={link.href}
               className={
@@ -30,7 +31,7 @@ export default function Navbar() {
               }
             >
               {link.label}
-            </a>
+            </Link>
           ))}
           <button className="bg-primary text-on-primary px-6 py-2 rounded-full text-sm font-semibold hover:opacity-90 active:scale-95 transition-all">
             Apply Now
@@ -52,7 +53,7 @@ export default function Navbar() {
       {open && (
         <div className="md:hidden bg-surface border-t border-outline-variant/20 shadow-lg px-6 py-5 flex flex-col gap-5">
           {navLinks.map((link) => (
-            <a
+            <Link
               key={link.label}
               href={link.href}
               className={
@@ -63,7 +64,7 @@ export default function Navbar() {
               onClick={() => setOpen(false)}
             >
               {link.label}
-            </a>
+            </Link>
           ))}
           <button className="bg-primary text-on-primary px-6 py-3 rounded-full text-sm font-semibold text-center">
             Apply Now

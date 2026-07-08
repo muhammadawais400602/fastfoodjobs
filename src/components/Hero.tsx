@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 const perks = ["Quick Apply", "Flexible Hours", "No Resume Needed"];
 
 const HERO_IMG =
@@ -43,9 +45,12 @@ export default function Hero() {
                 type="text"
               />
             </div>
-            <button className="w-full md:w-auto bg-primary text-on-primary h-12 px-10 rounded-xl text-sm font-semibold hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center shrink-0">
+            <Link
+              href="/jobs"
+              className="w-full md:w-auto bg-primary text-on-primary h-12 px-10 rounded-xl text-sm font-semibold hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center shrink-0"
+            >
               Search Jobs
-            </button>
+            </Link>
           </div>
 
           {/* Perks */}
