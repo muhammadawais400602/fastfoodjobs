@@ -18,6 +18,9 @@ export async function PATCH(request: Request) {
     phone: String(body.phone ?? "").trim(),
     website: String(body.website ?? "").trim(),
     hours: String(body.hours ?? "").trim(),
+    logoUrl: String(body.logoUrl ?? "").trim(),
+    coverUrl: String(body.coverUrl ?? "").trim(),
+    amenities: Array.isArray(body.amenities) ? body.amenities.map((a: unknown) => String(a)) : [],
     notifications: {
       newApplicants: Boolean(body.notifications?.newApplicants),
       interviewConfirmations: Boolean(body.notifications?.interviewConfirmations),

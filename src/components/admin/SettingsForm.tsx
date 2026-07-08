@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import type { RestaurantProfile } from "@/lib/settings";
+import { AMENITY_OPTIONS, type RestaurantProfile } from "@/lib/profile";
 
 const inputClass =
   "w-full px-4 py-3 bg-white border border-[#e4bebc] rounded-lg focus:ring-2 focus:ring-[#b7102a] outline-none text-sm";
@@ -31,6 +31,9 @@ export default function SettingsForm({ profile, email }: { profile: RestaurantPr
   const [pwMsg, setPwMsg] = useState<string | null>(null);
 
   const set = (patch: Partial<RestaurantProfile>) => setForm({ ...form, ...patch });
+
+  const toggleAmenity = (key: string) =>
+    set({ amenities: form.amenities.includes(key) ? form.amenities.filter((a) => a !== key) : [...form.amenities, key] });
 
   const save = async () => {
     setSaving(true);
@@ -144,9 +147,42 @@ export default function SettingsForm({ profile, email }: { profile: RestaurantPr
               rows={3}
               value={form.hours}
               onChange={(e) => set({ hours: e.target.value })}
-              placeholder={"Mon-Fri: 9AM - 10PM\nSat-Sun: 10AM - 11PM"}
+              placeholder={"Mon - Fri: 9AM - 10PM\nSat - Sun: 10AM - 11PM"}
             />
             <p className="text-xs text-[#8f6f6e]">One line per day range — shown on your public page.</p>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-semibold">Logo Image URL</label>
+            <input className={inputClass} value={form.logoUrl} onChange={(e) => set({ logoUrl: e.target.value })} placeholder="https://…/logo.png" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold">Cover Photo URL</label>
+            <input className={inputClass} value={form.coverUrl} onChange={(e) => set({ coverUrl: e.target.value })} placeholder="https://…/cover.jpg" />
+          </div>
+        </div>
+
+        {/* Amenities */}
+        <div className="mt-6">
+          <label className="text-sm font-semibold">Branch Amenities</label>
+          <p className="text-xs text-[#8f6f6e] mb-3">Pick what your location offers — shown on your public page.</p>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            {AMENITY_OPTIONS.map((a) => {
+              const on = form.amenities.includes(a.key);
+              return (
+                <button
+                  type="button"
+                  key={a.key}
+                  onClick={() => toggleAmenity(a.key)}
+                  className={`flex flex-col items-center justify-center gap-1 p-3 rounded-xl border text-center transition-all ${
+                    on ? "border-[#b7102a] bg-[#b7102a]/5 text-[#b7102a]" : "border-[#e4bebc] text-[#586158] hover:border-[#b7102a]/50"
+                  }`}
+                >
+                  <span className="material-symbols-outlined">{a.icon}</span>
+                  <span className="text-xs font-semibold">{a.label}</span>
+                </button>
+              );
+            })}
           </div>
         </div>
         {error && <p className="text-sm font-semibold text-[#93000a] bg-[#ffdad6] rounded-lg px-4 py-2 mt-4">{error}</p>}

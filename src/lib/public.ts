@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { getDb } from "@/lib/mongodb";
-import { normalizeProfile, type RestaurantProfile } from "@/lib/settings";
+import { normalizeProfile, type RestaurantProfile } from "@/lib/profile";
 
 export type PublicRestaurant = {
   id: string;
