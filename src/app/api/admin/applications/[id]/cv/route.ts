@@ -19,7 +19,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ id:
   return new NextResponse(new Uint8Array(bytes), {
     headers: {
       "Content-Type": cv.type || "application/octet-stream",
-      "Content-Disposition": `attachment; filename="${cv.name || "cv"}"`,
+      "Content-Disposition": `inline; filename="${cv.name || "cv"}"`,
     },
   });
 }

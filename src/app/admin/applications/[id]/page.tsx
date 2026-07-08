@@ -62,9 +62,11 @@ export default async function ApplicantDetailPage({ params }: { params: Promise<
                   {app.hasCv ? (
                     <a
                       href={`/api/admin/applications/${app._id}/cv`}
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="text-sm text-[#b7102a] font-semibold hover:underline"
                     >
-                      Download CV
+                      View CV
                     </a>
                   ) : (
                     <span className="text-sm">No CV attached</span>
@@ -79,6 +81,31 @@ export default async function ApplicantDetailPage({ params }: { params: Promise<
             <h4 className="text-xs font-semibold uppercase tracking-wider text-[#586158] mb-4">Why they want to work here</h4>
             <p className="text-[#001b3c] leading-relaxed whitespace-pre-line">{app.motivation || "—"}</p>
           </div>
+
+          {/* CV preview */}
+          {app.hasCv && (
+            <div className="bg-white rounded-xl p-6 border border-[#e4bebc] shadow-[0px_4px_20px_rgba(29,53,87,0.05)]">
+              <div className="flex items-center justify-between mb-4">
+                <h4 className="text-xs font-semibold uppercase tracking-wider text-[#586158]">Resume / CV</h4>
+                <a
+                  href={`/api/admin/applications/${app._id}/cv`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-[#b7102a] font-semibold hover:underline"
+                >
+                  Open full screen
+                </a>
+              </div>
+              <iframe
+                src={`/api/admin/applications/${app._id}/cv`}
+                className="w-full h-[600px] rounded-lg border border-[#e4bebc]"
+                title="Applicant CV"
+              />
+              <p className="text-xs text-[#586158] mt-2">
+                Word documents can&apos;t preview in-browser — use &quot;Open full screen&quot; to download those.
+              </p>
+            </div>
+          )}
         </div>
 
         <div className="col-span-12 lg:col-span-4">
