@@ -44,6 +44,63 @@ export async function getPublicRestaurant(id: string): Promise<PublicRestaurant 
   return mapRestaurant(u as Record<string, unknown>);
 }
 
+export type JobCard = {
+  id: string;
+  jobTitle: string;
+  jobType: string;
+  rate: string;
+  description: string;
+  restaurant: string;
+  restaurantId: string;
+};
+
+// All active jobs across every restaurant, with the owning restaurant's id resolved.
+export async function getAllActiveJobs(): Promise<JobCard[]> {
+  const db = await getDb();
+  const postings = await db
+    .collection("postings")
+    .find({ status: "active" })
+    .sort({ createdAt: -1 })
+    .limit(200)
+    .toArray();
+
+  const owners = await db.collection("users").find({}).project({ restaurant: 1 }).toArray();
+  const idByName = new Map<string, string>();
+  for (const o of owners) idByName.set(o.restaurant, o._id.toString());
+
+  return postings.map((d) => ({
+    id: d._id.toString(),
+    jobTitle: d.jobTitle ?? "",
+    jobType: d.jobType ?? "",
+    rate: d.rate ?? "",
+    description: d.description ?? "",
+    restaurant: d.restaurant ?? "",
+    restaurantId: idByName.get(d.restaurant) ?? "",
+  }));
+}
+
+// Restaurants that currently have at least one active job.
+export async function getRestaurantsWithActiveJobs(): Promise<{ id: string; name: string; jobCount: number }[]> {
+  const db = await getDb();
+  const grouped = await db
+    .collection("postings")
+    .aggregate([
+      { $match: { status: "active" } },
+      { $group: { _id: "$restaurant", jobCount: { $sum: 1 } } },
+      { $sort: { jobCount: -1 } },
+      { $limit: 12 },
+    ])
+    .toArray();
+
+  const owners = await db.collection("users").find({}).project({ restaurant: 1 }).toArray();
+  const idByName = new Map<string, string>();
+  for (const o of owners) idByName.set(o.restaurant, o._id.toString());
+
+  return grouped
+    .map((g) => ({ id: idByName.get(g._id) ?? "", name: g._id as string, jobCount: g.jobCount as number }))
+    .filter((r) => r.id);
+}
+
 export async function getRestaurantActiveJobs(restaurantName: string): Promise<PublicJob[]> {
   const db = await getDb();
   const docs = await db

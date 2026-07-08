@@ -1,10 +1,11 @@
 import Navbar from "@/components/Navbar";
 import Hero from "@/components/Hero";
-import FeaturedRestaurants from "@/components/FeaturedRestaurants";
-import ExploreOpportunities from "@/components/ExploreOpportunities";
+import FeaturedReal from "@/components/FeaturedReal";
 import WhySection from "@/components/WhySection";
 import CTASection from "@/components/CTASection";
 import Footer from "@/components/Footer";
+
+export const dynamic = "force-dynamic";
 
 export default function Home() {
   return (
@@ -12,8 +13,7 @@ export default function Home() {
       <Navbar />
       <main className="pt-14">
         <Hero />
-        <FeaturedRestaurants />
-        <ExploreOpportunities />
+        <FeaturedReal />
         <WhySection />
         <CTASection />
       </main>
