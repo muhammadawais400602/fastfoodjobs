@@ -142,9 +142,12 @@ export default async function JobPage({ params }: Props) {
           <aside className="lg:col-span-4 space-y-6">
             {/* Apply card */}
             <div className="bg-surface-container-lowest rounded-xl p-6 shadow-[0px_8px_30px_rgba(29,53,87,0.12)] border border-primary/10">
-              <button className="w-full bg-primary text-on-primary py-5 rounded-lg text-xl font-bold mb-4 active:scale-95 transition-all hover:bg-primary-container shadow-md">
+              <Link
+                href={`/apply/${job.slug}`}
+                className="block w-full bg-primary text-on-primary py-5 rounded-lg text-xl font-bold mb-4 active:scale-95 transition-all hover:bg-primary-container shadow-md text-center"
+              >
                 Apply for this Job
-              </button>
+              </Link>
               <button className="w-full border border-outline text-on-surface py-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-1 hover:bg-surface-container transition-colors">
                 <span className="material-symbols-outlined text-[18px]">bookmark</span>
                 Save Job

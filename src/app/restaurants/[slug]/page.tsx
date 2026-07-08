@@ -190,9 +190,12 @@ export default async function RestaurantPage({ params }: Props) {
                 <p className="text-base opacity-90">
                   We&apos;re always looking for energetic individuals to join our {profile.city.split(",")[0]} family. Apply today!
                 </p>
-                <button className="w-full bg-white text-primary font-bold py-4 rounded-lg shadow-xl hover:scale-105 transition-transform">
+                <Link
+                  href={`/apply/${jobSlug(profile.slug, profile.jobs[0].title)}`}
+                  className="block w-full bg-white text-primary font-bold py-4 rounded-lg shadow-xl hover:scale-105 transition-transform text-center"
+                >
                   Quick Apply
-                </button>
+                </Link>
               </div>
             </div>
           </div>
