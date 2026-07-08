@@ -62,7 +62,7 @@ export default async function ApplyPage({ params }: Props) {
             </p>
           </div>
 
-          <ApplicationForm />
+          <ApplicationForm jobSlug={job.slug} />
         </div>
       </main>
       <Footer />

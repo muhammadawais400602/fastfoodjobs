@@ -4,7 +4,7 @@ import Link from "next/link";
 
 const navLinks = [
   { label: "Find Jobs", href: "/jobs", active: true },
-  { label: "Post a Job", href: "#", active: false },
+  { label: "Post a Job", href: "/post-a-job", active: false },
   { label: "Login", href: "#", active: false },
 ];
 
@@ -33,9 +33,9 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
-          <button className="bg-primary text-on-primary px-6 py-2 rounded-full text-sm font-semibold hover:opacity-90 active:scale-95 transition-all">
+          <Link href="/jobs" className="bg-primary text-on-primary px-6 py-2 rounded-full text-sm font-semibold hover:opacity-90 active:scale-95 transition-all">
             Apply Now
-          </button>
+          </Link>
         </div>
 
         {/* Mobile hamburger */}
@@ -66,9 +66,9 @@ export default function Navbar() {
               {link.label}
             </Link>
           ))}
-          <button className="bg-primary text-on-primary px-6 py-3 rounded-full text-sm font-semibold text-center">
+          <Link href="/jobs" onClick={() => setOpen(false)} className="bg-primary text-on-primary px-6 py-3 rounded-full text-sm font-semibold text-center">
             Apply Now
-          </button>
+          </Link>
         </div>
       )}
     </header>

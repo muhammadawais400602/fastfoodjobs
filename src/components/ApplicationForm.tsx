@@ -2,21 +2,33 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 
-export default function ApplicationForm() {
+export default function ApplicationForm({ jobSlug }: { jobSlug: string }) {
   const [fileName, setFileName] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
   const handleFiles = (files: FileList | null) => {
     if (files && files.length > 0) setFileName(files[0].name);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
-    setTimeout(() => setSent(true), 1200);
+    setError(null);
+    const formData = new FormData(e.currentTarget);
+    formData.set("job_slug", jobSlug);
+    try {
+      const res = await fetch("/api/applications", { method: "POST", body: formData });
+      const json = await res.json();
+      if (!res.ok || !json.ok) throw new Error(json.error ?? "Something went wrong. Please try again.");
+      setSent(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -131,6 +143,10 @@ export default function ApplicationForm() {
                 rows={4}
               ></textarea>
             </div>
+
+            {error && (
+              <p className="text-sm font-semibold text-error bg-error-container rounded-lg px-4 py-3">{error}</p>
+            )}
 
             {/* Action footer */}
             <div className="pt-6 flex flex-col md:flex-row items-center justify-between gap-6 border-t border-outline-variant/30 mt-10">

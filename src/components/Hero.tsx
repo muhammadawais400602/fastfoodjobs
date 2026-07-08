@@ -1,4 +1,6 @@
-import Link from "next/link";
+"use client";
+import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 const perks = ["Quick Apply", "Flexible Hours", "No Resume Needed"];
 
@@ -6,6 +8,17 @@ const HERO_IMG =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuBEv3_o89tW4Px4Lc3JpHzmiTTFkolQaZak4CiLI95klHrSgUCcqXo9n_4wWxi7NIMEEFcgBCjGFKefgvQApj_LufXQ6aVXoFryqCbfm-nioj6KeOmiOTXLc_-L2kLyrJbQWgMyN_dzGataENLhRmPcXiIkbvlBEdQ7NNk11I4b6HOniwsH4MgMO7X9hyRO4r__FLpNkjFfQZIDI9odHJY6sgAAjDkI-rQ_HXzSIzX6HInr3NsGVE7EdJZh9cbdJiKHXYqdduNSRlGf";
 
 export default function Hero() {
+  const router = useRouter();
+  const [query, setQuery] = useState("");
+  const [zip, setZip] = useState("");
+
+  const search = () => {
+    const params = new URLSearchParams();
+    if (query) params.set("q", query);
+    if (zip) params.set("loc", zip);
+    router.push(`/jobs${params.toString() ? `?${params.toString()}` : ""}`);
+  };
+
   return (
     <section className="relative flex items-center overflow-hidden hero-pattern py-14 md:py-20 lg:py-0 lg:min-h-[819px]">
       <div className="absolute inset-0 bg-gradient-to-br from-primary-fixed/30 to-transparent pointer-events-none"></div>
@@ -34,6 +47,9 @@ export default function Hero() {
                 className="w-full bg-transparent border-none outline-none focus:ring-0 text-base h-12"
                 placeholder="Job title or keyword"
                 type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && search()}
               />
             </div>
             <div className="hidden md:block w-px h-8 bg-outline-variant/30"></div>
@@ -43,14 +59,17 @@ export default function Hero() {
                 className="w-full bg-transparent border-none outline-none focus:ring-0 text-base h-12"
                 placeholder="Enter Zip Code"
                 type="text"
+                value={zip}
+                onChange={(e) => setZip(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && search()}
               />
             </div>
-            <Link
-              href="/jobs"
+            <button
+              onClick={search}
               className="w-full md:w-auto bg-primary text-on-primary h-12 px-10 rounded-xl text-sm font-semibold hover:brightness-110 active:scale-[0.98] transition-all flex items-center justify-center shrink-0"
             >
               Search Jobs
-            </Link>
+            </button>
           </div>
 
           {/* Perks */}

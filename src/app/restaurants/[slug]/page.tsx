@@ -177,9 +177,14 @@ export default async function RestaurantPage({ params }: Props) {
                       ))}
                     </ul>
                   </div>
-                  <button className="w-full border-2 border-primary text-primary text-sm font-semibold py-3 rounded-lg hover:bg-primary-fixed transition-colors">
+                  <a
+                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(profile.address.join(" "))}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block text-center w-full border-2 border-primary text-primary text-sm font-semibold py-3 rounded-lg hover:bg-primary-fixed transition-colors"
+                  >
                     Get Directions
-                  </button>
+                  </a>
                 </div>
               </div>
 

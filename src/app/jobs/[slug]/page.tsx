@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import SaveJobButton from "@/components/SaveJobButton";
 import { jobs, getJob, mapImage } from "@/data/jobs";
 
 type Props = { params: Promise<{ slug: string }> };
@@ -148,10 +149,7 @@ export default async function JobPage({ params }: Props) {
               >
                 Apply for this Job
               </Link>
-              <button className="w-full border border-outline text-on-surface py-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-1 hover:bg-surface-container transition-colors">
-                <span className="material-symbols-outlined text-[18px]">bookmark</span>
-                Save Job
-              </button>
+              <SaveJobButton slug={job.slug} />
               <p className="text-center mt-4 text-xs font-bold text-on-surface-variant">
                 Application takes less than 3 minutes.
               </p>

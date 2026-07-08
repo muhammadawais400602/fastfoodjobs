@@ -19,9 +19,12 @@ export default function CTASection() {
               >
                 Browse All Jobs
               </Link>
-              <button className="bg-transparent border-2 border-white/30 text-white px-10 py-4 rounded-xl text-sm font-semibold hover:bg-white/10 transition-all">
+              <Link
+                href="/post-a-job"
+                className="bg-transparent border-2 border-white/30 text-white px-10 py-4 rounded-xl text-sm font-semibold hover:bg-white/10 transition-all"
+              >
                 For Employers
-              </button>
+              </Link>
             </div>
           </div>
         </div>
