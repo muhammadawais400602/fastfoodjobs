@@ -104,6 +104,15 @@ export default function SettingsForm({ profile, email }: { profile: RestaurantPr
             </select>
           </div>
           <div className="md:col-span-2 space-y-2">
+            <label className="text-sm font-semibold">Tagline</label>
+            <input
+              className={inputClass}
+              value={form.tagline}
+              onChange={(e) => set({ tagline: e.target.value })}
+              placeholder="Flame-grilled burgers, hiring now"
+            />
+          </div>
+          <div className="md:col-span-2 space-y-2">
             <label className="text-sm font-semibold">Description</label>
             <textarea
               className={inputClass}
@@ -117,8 +126,27 @@ export default function SettingsForm({ profile, email }: { profile: RestaurantPr
             <input className={inputClass} value={form.address} onChange={(e) => set({ address: e.target.value })} />
           </div>
           <div className="space-y-2">
+            <label className="text-sm font-semibold">City</label>
+            <input className={inputClass} value={form.city} onChange={(e) => set({ city: e.target.value })} placeholder="Beverly Hills, CA" />
+          </div>
+          <div className="space-y-2">
+            <label className="text-sm font-semibold">Phone</label>
+            <input className={inputClass} value={form.phone} onChange={(e) => set({ phone: e.target.value })} placeholder="(310) 555-0198" />
+          </div>
+          <div className="space-y-2">
             <label className="text-sm font-semibold">Website</label>
             <input className={inputClass} value={form.website} onChange={(e) => set({ website: e.target.value })} placeholder="https://…" />
+          </div>
+          <div className="md:col-span-2 space-y-2">
+            <label className="text-sm font-semibold">Opening Hours</label>
+            <textarea
+              className={inputClass}
+              rows={3}
+              value={form.hours}
+              onChange={(e) => set({ hours: e.target.value })}
+              placeholder={"Mon-Fri: 9AM - 10PM\nSat-Sun: 10AM - 11PM"}
+            />
+            <p className="text-xs text-[#8f6f6e]">One line per day range — shown on your public page.</p>
           </div>
         </div>
         {error && <p className="text-sm font-semibold text-[#93000a] bg-[#ffdad6] rounded-lg px-4 py-2 mt-4">{error}</p>}

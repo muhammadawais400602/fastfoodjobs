@@ -1,6 +1,6 @@
 import { ObjectId } from "mongodb";
 import { getDb } from "@/lib/mongodb";
-import type { RestaurantProfile } from "@/lib/settings";
+import { normalizeProfile, type RestaurantProfile } from "@/lib/settings";
 
 export type PublicRestaurant = {
   id: string;
@@ -18,21 +18,13 @@ export type PublicJob = {
   status: string;
 };
 
-const DEFAULT_NOTIF = { newApplicants: true, interviewConfirmations: true, weeklyReports: false };
-
 function mapRestaurant(u: Record<string, unknown>): PublicRestaurant {
   const p = (u.profile ?? {}) as Partial<RestaurantProfile>;
+  const name = (u.restaurant as string) ?? p.name ?? "Restaurant";
   return {
     id: (u._id as ObjectId).toString(),
-    restaurant: (u.restaurant as string) ?? p.name ?? "Restaurant",
-    profile: {
-      name: p.name ?? (u.restaurant as string) ?? "Restaurant",
-      cuisine: p.cuisine ?? "Fast Casual",
-      description: p.description ?? "",
-      address: p.address ?? "",
-      website: p.website ?? "",
-      notifications: { ...DEFAULT_NOTIF, ...(p.notifications ?? {}) },
-    },
+    restaurant: name,
+    profile: normalizeProfile(p, name),
   };
 }
 

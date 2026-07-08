@@ -10,10 +10,14 @@ export async function PATCH(request: Request) {
   const body = await request.json().catch(() => ({}));
   const profile = {
     name: String(body.name ?? "").trim(),
+    tagline: String(body.tagline ?? "").trim(),
     cuisine: String(body.cuisine ?? "Fast Casual").trim(),
     description: String(body.description ?? "").trim(),
     address: String(body.address ?? "").trim(),
+    city: String(body.city ?? "").trim(),
+    phone: String(body.phone ?? "").trim(),
     website: String(body.website ?? "").trim(),
+    hours: String(body.hours ?? "").trim(),
     notifications: {
       newApplicants: Boolean(body.notifications?.newApplicants),
       interviewConfirmations: Boolean(body.notifications?.interviewConfirmations),

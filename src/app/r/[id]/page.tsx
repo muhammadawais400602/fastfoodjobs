@@ -37,14 +37,23 @@ export default async function PublicRestaurantPage({ params }: Props) {
             <h1 className="font-extrabold text-[36px] md:text-[48px] leading-tight tracking-[-0.02em] text-on-surface">
               {r.restaurant}
             </h1>
+            {r.profile.tagline && (
+              <p className="text-xl font-semibold text-primary mt-2">{r.profile.tagline}</p>
+            )}
             {r.profile.description && (
               <p className="text-lg text-on-surface-variant max-w-2xl mt-4">{r.profile.description}</p>
             )}
-            <div className="flex flex-wrap gap-6 mt-6 text-sm text-on-surface-variant">
-              {r.profile.address && (
+            <div className="flex flex-wrap gap-x-6 gap-y-3 mt-6 text-sm text-on-surface-variant">
+              {(r.profile.address || r.profile.city) && (
                 <span className="flex items-center gap-1">
                   <span className="material-symbols-outlined text-[18px] text-primary">location_on</span>
-                  {r.profile.address}
+                  {[r.profile.address, r.profile.city].filter(Boolean).join(", ")}
+                </span>
+              )}
+              {r.profile.phone && (
+                <span className="flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[18px] text-primary">call</span>
+                  {r.profile.phone}
                 </span>
               )}
               {r.profile.website && (
@@ -54,6 +63,14 @@ export default async function PublicRestaurantPage({ params }: Props) {
                 </a>
               )}
             </div>
+            {r.profile.hours && (
+              <div className="mt-6 inline-flex flex-col gap-1 bg-white/60 rounded-xl px-5 py-4">
+                <span className="text-xs font-bold uppercase tracking-wider text-on-surface-variant flex items-center gap-1">
+                  <span className="material-symbols-outlined text-[16px]">schedule</span> Opening Hours
+                </span>
+                <p className="text-sm text-on-surface whitespace-pre-line">{r.profile.hours}</p>
+              </div>
+            )}
           </div>
         </section>
 
