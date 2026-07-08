@@ -5,7 +5,7 @@ import Link from "next/link";
 const navLinks = [
   { label: "Find Jobs", href: "/jobs", active: true },
   { label: "Post a Job", href: "/post-a-job", active: false },
-  { label: "Login", href: "#", active: false },
+  { label: "Login", href: "/login", active: false },
 ];
 
 export default function Navbar() {
