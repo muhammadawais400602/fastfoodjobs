@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
+import { getDb } from "@/lib/mongodb";
 
-// Receives employer job postings. Logged to the server console (visible in
-// Vercel's function logs) until a database is connected.
 export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
   if (!body) {
@@ -17,7 +16,25 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: false, error: "Please enter a valid email address." }, { status: 400 });
   }
 
-  console.log("[job posting received]", { ...body, receivedAt: new Date().toISOString() });
+  try {
+    const db = await getDb();
+    await db.collection("postings").insertOne({
+      restaurant: String(restaurant).trim(),
+      contactEmail: String(contactEmail).trim(),
+      jobTitle: String(jobTitle).trim(),
+      jobType: String(jobType).trim(),
+      rate: String(rate).trim(),
+      description: String(description).trim(),
+      status: "pending_review",
+      createdAt: new Date(),
+    });
+  } catch (err) {
+    console.error("[postings] failed to save:", err);
+    return NextResponse.json(
+      { ok: false, error: "We couldn't save your posting right now. Please try again." },
+      { status: 500 }
+    );
+  }
 
   return NextResponse.json({ ok: true });
 }

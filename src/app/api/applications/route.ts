@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
+import { Binary } from "mongodb";
+import { getDb } from "@/lib/mongodb";
 
-// Receives job applications. Applications are logged to the server console
-// (visible in Vercel's function logs). Swap the log for a database insert or
-// email service when one is connected.
+const MAX_CV_BYTES = 5 * 1024 * 1024;
+
 export async function POST(request: Request) {
   const formData = await request.formData();
 
@@ -19,19 +20,35 @@ export async function POST(request: Request) {
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
     return NextResponse.json({ ok: false, error: "Please enter a valid email address." }, { status: 400 });
   }
-  if (cv instanceof File && cv.size > 5 * 1024 * 1024) {
+  if (cv instanceof File && cv.size > MAX_CV_BYTES) {
     return NextResponse.json({ ok: false, error: "CV must be 5MB or smaller." }, { status: 400 });
   }
 
-  console.log("[application received]", {
-    jobSlug,
-    fullName,
-    email,
-    phone,
-    motivation,
-    cv: cv instanceof File ? { name: cv.name, size: cv.size, type: cv.type } : null,
-    receivedAt: new Date().toISOString(),
-  });
+  let cvDoc: { name: string; size: number; type: string; data: Binary } | null = null;
+  if (cv instanceof File && cv.size > 0) {
+    const bytes = Buffer.from(await cv.arrayBuffer());
+    cvDoc = { name: cv.name, size: cv.size, type: cv.type, data: new Binary(bytes) };
+  }
+
+  try {
+    const db = await getDb();
+    await db.collection("applications").insertOne({
+      jobSlug,
+      fullName,
+      email,
+      phone,
+      motivation,
+      cv: cvDoc,
+      status: "new",
+      createdAt: new Date(),
+    });
+  } catch (err) {
+    console.error("[applications] failed to save:", err);
+    return NextResponse.json(
+      { ok: false, error: "We couldn't save your application right now. Please try again." },
+      { status: 500 }
+    );
+  }
 
   return NextResponse.json({ ok: true });
 }
