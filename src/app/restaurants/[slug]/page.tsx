@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { profiles, getProfile } from "@/data/profiles";
+import { jobSlug } from "@/data/jobs";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -129,9 +131,12 @@ export default async function RestaurantPage({ params }: Props) {
                           </span>
                         </div>
                       </div>
-                      <button className="mt-6 md:mt-0 w-full md:w-auto bg-primary text-on-primary px-10 py-2.5 rounded-lg text-sm font-semibold hover:shadow-lg transition-all">
+                      <Link
+                        href={`/jobs/${jobSlug(profile.slug, job.title)}`}
+                        className="mt-6 md:mt-0 w-full md:w-auto bg-primary text-on-primary px-10 py-2.5 rounded-lg text-sm font-semibold hover:shadow-lg transition-all text-center"
+                      >
                         View Job
-                      </button>
+                      </Link>
                     </div>
                   ))}
                 </div>
