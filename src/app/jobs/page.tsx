@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { listings } from "@/data/listings";
@@ -113,9 +114,10 @@ export default function JobsPage() {
           <div className="flex-1">
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {listings.map((l) => (
-                <div
-                  key={l.name}
-                  className="group bg-surface-container-lowest p-6 rounded-xl shadow-[0px_4px_20px_rgba(29,53,87,0.05)] border border-transparent hover:border-primary-fixed transition-all cursor-pointer active:scale-[0.98]"
+                <Link
+                  key={l.slug}
+                  href={`/restaurants/${l.slug}`}
+                  className="group bg-surface-container-lowest p-6 rounded-xl shadow-[0px_4px_20px_rgba(29,53,87,0.05)] border border-transparent hover:border-primary-fixed transition-all cursor-pointer active:scale-[0.98] block"
                 >
                   <div className="flex items-start justify-between gap-3 mb-6">
                     <div className="flex gap-4 min-w-0">
@@ -142,7 +144,7 @@ export default function JobsPage() {
                       {l.rate}
                     </div>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
 
