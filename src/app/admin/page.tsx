@@ -1,6 +1,7 @@
 import Link from "next/link";
 import AdminShell from "@/components/admin/AdminShell";
-import { getApplications, getPostings, positionFromSlug } from "@/lib/data";
+import { getApplications, getPostings, positionOf } from "@/lib/data";
+import { getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,11 @@ const statusStyle: Record<string, string> = {
 };
 
 export default async function DashboardPage() {
-  const [applications, postings] = await Promise.all([getApplications(), getPostings()]);
+  const session = await getSession();
+  const [applications, postings] = await Promise.all([
+    getApplications(session!.restaurant),
+    getPostings(session!.restaurant),
+  ]);
   const activeListings = postings.filter((p) => p.status === "active").length;
   const newApplicants = applications.filter((a) => a.status === "new").length;
   const recent = applications.slice(0, 5);
@@ -62,7 +67,7 @@ export default async function DashboardPage() {
               {recent.map((a) => (
                 <tr key={a._id} className="hover:bg-[#f0f3ff] transition-colors">
                   <td className="px-6 py-4 font-medium">{a.fullName}</td>
-                  <td className="px-6 py-4 text-[#586158]">{positionFromSlug(a.jobSlug)}</td>
+                  <td className="px-6 py-4 text-[#586158]">{positionOf(a)}</td>
                   <td className="px-6 py-4 text-sm text-[#586158]">{new Date(a.createdAt).toLocaleDateString()}</td>
                   <td className="px-6 py-4">
                     <span className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-bold capitalize ${statusStyle[a.status] ?? statusStyle.new}`}>

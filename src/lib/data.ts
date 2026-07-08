@@ -4,6 +4,8 @@ import { getDb } from "@/lib/mongodb";
 export type ApplicationDoc = {
   _id: string;
   jobSlug: string;
+  jobTitle: string;
+  restaurant: string;
   fullName: string;
   email: string;
   phone: string;
@@ -16,32 +18,43 @@ export type ApplicationDoc = {
 
 function titleFromSlug(slug: string) {
   const parts = (slug || "").split("-");
-  // slug shape: <restaurant>-<job-title>; drop the restaurant prefix heuristically
-  return parts
-    .slice(1)
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(" ") || "Applicant";
+  return (
+    parts
+      .slice(1)
+      .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
+      .join(" ") || "Applicant"
+  );
 }
 
-export function positionFromSlug(slug: string) {
-  return titleFromSlug(slug);
+// Prefer a stored jobTitle; fall back to deriving from the demo slug.
+export function positionOf(app: { jobTitle?: string; jobSlug?: string }) {
+  return app.jobTitle && app.jobTitle.trim() ? app.jobTitle : titleFromSlug(app.jobSlug ?? "");
 }
 
-export async function getApplications(): Promise<ApplicationDoc[]> {
-  const db = await getDb();
-  const docs = await db.collection("applications").find({}).sort({ createdAt: -1 }).limit(200).toArray();
-  return docs.map((d) => ({
-    _id: d._id.toString(),
-    jobSlug: d.jobSlug ?? "",
-    fullName: d.fullName ?? "",
-    email: d.email ?? "",
-    phone: d.phone ?? "",
-    motivation: d.motivation ?? "",
-    status: d.status ?? "new",
-    notes: d.notes ?? "",
+function mapApplication(d: Record<string, unknown>): ApplicationDoc {
+  return {
+    _id: (d._id as ObjectId).toString(),
+    jobSlug: (d.jobSlug as string) ?? "",
+    jobTitle: (d.jobTitle as string) ?? "",
+    restaurant: (d.restaurant as string) ?? "",
+    fullName: (d.fullName as string) ?? "",
+    email: (d.email as string) ?? "",
+    phone: (d.phone as string) ?? "",
+    motivation: (d.motivation as string) ?? "",
+    status: (d.status as string) ?? "new",
+    notes: (d.notes as string) ?? "",
     hasCv: Boolean(d.cv),
     createdAt: (d.createdAt instanceof Date ? d.createdAt : new Date()).toISOString(),
-  }));
+  };
+}
+
+// Applications for a restaurant. Includes legacy demo applications (no restaurant field)
+// so nothing is hidden while you're testing.
+export async function getApplications(restaurant?: string): Promise<ApplicationDoc[]> {
+  const db = await getDb();
+  const filter = restaurant ? { $or: [{ restaurant }, { restaurant: { $exists: false } }, { restaurant: "" }] } : {};
+  const docs = await db.collection("applications").find(filter).sort({ createdAt: -1 }).limit(500).toArray();
+  return docs.map((d) => mapApplication(d as Record<string, unknown>));
 }
 
 export async function getApplication(id: string): Promise<ApplicationDoc | null> {
@@ -49,18 +62,7 @@ export async function getApplication(id: string): Promise<ApplicationDoc | null>
   const db = await getDb();
   const d = await db.collection("applications").findOne({ _id: new ObjectId(id) });
   if (!d) return null;
-  return {
-    _id: d._id.toString(),
-    jobSlug: d.jobSlug ?? "",
-    fullName: d.fullName ?? "",
-    email: d.email ?? "",
-    phone: d.phone ?? "",
-    motivation: d.motivation ?? "",
-    status: d.status ?? "new",
-    notes: d.notes ?? "",
-    hasCv: Boolean(d.cv),
-    createdAt: (d.createdAt instanceof Date ? d.createdAt : new Date()).toISOString(),
-  };
+  return mapApplication(d as Record<string, unknown>);
 }
 
 export type PostingDoc = {
@@ -75,20 +77,25 @@ export type PostingDoc = {
   createdAt: string;
 };
 
-export async function getPostings(): Promise<PostingDoc[]> {
-  const db = await getDb();
-  const docs = await db.collection("postings").find({}).sort({ createdAt: -1 }).limit(200).toArray();
-  return docs.map((d) => ({
-    _id: d._id.toString(),
-    restaurant: d.restaurant ?? "",
-    jobTitle: d.jobTitle ?? "",
-    jobType: d.jobType ?? "",
-    rate: d.rate ?? "",
-    description: d.description ?? "",
-    status: d.status ?? "pending_review",
-    applicants: d.applicants ?? 0,
+function mapPosting(d: Record<string, unknown>): PostingDoc {
+  return {
+    _id: (d._id as ObjectId).toString(),
+    restaurant: (d.restaurant as string) ?? "",
+    jobTitle: (d.jobTitle as string) ?? "",
+    jobType: (d.jobType as string) ?? "",
+    rate: (d.rate as string) ?? "",
+    description: (d.description as string) ?? "",
+    status: (d.status as string) ?? "pending_review",
+    applicants: (d.applicants as number) ?? 0,
     createdAt: (d.createdAt instanceof Date ? d.createdAt : new Date()).toISOString(),
-  }));
+  };
+}
+
+export async function getPostings(restaurant?: string): Promise<PostingDoc[]> {
+  const db = await getDb();
+  const filter = restaurant ? { restaurant } : {};
+  const docs = await db.collection("postings").find(filter).sort({ createdAt: -1 }).limit(200).toArray();
+  return docs.map((d) => mapPosting(d as Record<string, unknown>));
 }
 
 export type TeamDoc = {
@@ -102,9 +109,10 @@ export type TeamDoc = {
   createdAt: string;
 };
 
-export async function getTeam(): Promise<TeamDoc[]> {
+export async function getTeam(restaurant?: string): Promise<TeamDoc[]> {
   const db = await getDb();
-  const docs = await db.collection("team").find({}).sort({ createdAt: -1 }).limit(200).toArray();
+  const filter = restaurant ? { restaurant } : {};
+  const docs = await db.collection("team").find(filter).sort({ createdAt: -1 }).limit(200).toArray();
   return docs.map((d) => ({
     _id: d._id.toString(),
     name: d.name ?? "",

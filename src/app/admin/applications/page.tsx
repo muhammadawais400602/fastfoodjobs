@@ -1,6 +1,7 @@
 import Link from "next/link";
 import AdminShell from "@/components/admin/AdminShell";
-import { getApplications, positionFromSlug } from "@/lib/data";
+import { getApplications, positionOf } from "@/lib/data";
+import { getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +14,8 @@ const statusStyle: Record<string, string> = {
 };
 
 export default async function ApplicationsPage() {
-  const applications = await getApplications();
+  const session = await getSession();
+  const applications = await getApplications(session!.restaurant);
 
   return (
     <AdminShell active="Applications" title="Applications" subtitle={`${applications.length} total applicants`}>
@@ -37,7 +39,7 @@ export default async function ApplicationsPage() {
                 {applications.map((a) => (
                   <tr key={a._id} className="hover:bg-[#f0f3ff] transition-colors">
                     <td className="px-6 py-4 font-medium">{a.fullName}</td>
-                    <td className="px-6 py-4 text-[#586158]">{positionFromSlug(a.jobSlug)}</td>
+                    <td className="px-6 py-4 text-[#586158]">{positionOf(a)}</td>
                     <td className="px-6 py-4 text-sm text-[#586158]">{a.email}</td>
                     <td className="px-6 py-4 text-sm text-[#586158]">{new Date(a.createdAt).toLocaleDateString()}</td>
                     <td className="px-6 py-4">

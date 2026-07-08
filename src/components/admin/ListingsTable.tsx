@@ -76,6 +76,11 @@ export default function ListingsTable({ postings }: { postings: PostingDoc[] }) 
                 </td>
                 <td className="px-6 py-5 text-right">
                   <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    {p.status === "active" && (
+                      <a href={`/j/${p._id}`} target="_blank" rel="noopener noreferrer" title="View public page" className="p-2 text-[#586158] hover:text-[#b7102a] rounded-lg transition-colors">
+                        <span className="material-symbols-outlined text-[20px]">open_in_new</span>
+                      </a>
+                    )}
                     <button onClick={() => setEditing(p)} title="Edit" className="p-2 text-[#586158] hover:text-[#b7102a] rounded-lg transition-colors">
                       <span className="material-symbols-outlined text-[20px]">edit</span>
                     </button>

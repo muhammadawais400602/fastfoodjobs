@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import AdminShell from "@/components/admin/AdminShell";
 import ApplicantActions from "@/components/admin/ApplicantActions";
-import { getApplication, positionFromSlug } from "@/lib/data";
+import { getApplication, positionOf } from "@/lib/data";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +19,7 @@ export default async function ApplicantDetailPage({ params }: { params: Promise<
     .toUpperCase();
 
   return (
-    <AdminShell active="Applications" title={`Applicant: ${app.fullName}`} subtitle={positionFromSlug(app.jobSlug)}>
+    <AdminShell active="Applications" title={`Applicant: ${app.fullName}`} subtitle={positionOf(app)}>
       <div className="mb-6 flex items-center gap-1">
         <span className="material-symbols-outlined text-[#586158] text-[20px]">chevron_left</span>
         <Link href="/admin/applications" className="text-sm font-semibold text-[#586158] hover:text-[#b7102a]">
@@ -38,7 +38,7 @@ export default async function ApplicantDetailPage({ params }: { params: Promise<
               <div className="flex flex-wrap justify-between items-start gap-4">
                 <div>
                   <h3 className="text-2xl font-bold">{app.fullName}</h3>
-                  <p className="text-[#586158]">Applied for {positionFromSlug(app.jobSlug)}</p>
+                  <p className="text-[#586158]">Applied for {positionOf(app)}</p>
                 </div>
                 <span className="px-3 py-1 bg-[#c7e7ff]/40 text-[#286182] text-xs font-bold rounded-full border border-[#286182]/20 capitalize">
                   {app.status}

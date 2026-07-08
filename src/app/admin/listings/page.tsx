@@ -2,11 +2,13 @@ import AdminShell from "@/components/admin/AdminShell";
 import CreateListing from "@/components/admin/CreateListing";
 import ListingsTable from "@/components/admin/ListingsTable";
 import { getPostings } from "@/lib/data";
+import { getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function ListingsPage() {
-  const postings = await getPostings();
+  const session = await getSession();
+  const postings = await getPostings(session!.restaurant);
 
   return (
     <AdminShell

@@ -1,11 +1,13 @@
 import AdminShell from "@/components/admin/AdminShell";
 import AddTeamMember from "@/components/admin/AddTeamMember";
 import { getTeam } from "@/lib/data";
+import { getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function TeamPage() {
-  const team = await getTeam();
+  const session = await getSession();
+  const team = await getTeam(session!.restaurant);
   const onShift = team.filter((t) => t.status === "on_shift").length;
 
   const stats = [

@@ -1,11 +1,13 @@
 import Link from "next/link";
 import AdminShell from "@/components/admin/AdminShell";
-import { getApplications, positionFromSlug } from "@/lib/data";
+import { getApplications, positionOf } from "@/lib/data";
+import { getSession } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
 export default async function MessagesPage() {
-  const applications = await getApplications();
+  const session = await getSession();
+  const applications = await getApplications(session!.restaurant);
 
   return (
     <AdminShell active="Messages" title="Messages" subtitle="Reach out to candidates by email.">
@@ -21,7 +23,7 @@ export default async function MessagesPage() {
               <li key={a._id} className="px-6 py-4 flex items-center justify-between gap-4 hover:bg-[#f0f3ff] transition-colors">
                 <div className="min-w-0">
                   <p className="font-semibold truncate">{a.fullName}</p>
-                  <p className="text-xs text-[#b7102a] font-semibold">{positionFromSlug(a.jobSlug)} applicant</p>
+                  <p className="text-xs text-[#b7102a] font-semibold">{positionOf(a)} applicant</p>
                   <p className="text-sm text-[#586158] truncate">{a.email}</p>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
@@ -29,7 +31,7 @@ export default async function MessagesPage() {
                     View
                   </Link>
                   <a
-                    href={`mailto:${a.email}?subject=${encodeURIComponent(`Your application for ${positionFromSlug(a.jobSlug)}`)}`}
+                    href={`mailto:${a.email}?subject=${encodeURIComponent(`Your application for ${positionOf(a)}`)}`}
                     className="px-4 py-2 rounded-lg bg-[#b7102a] text-white text-sm font-semibold hover:brightness-110 transition-all flex items-center gap-1"
                   >
                     <span className="material-symbols-outlined text-[18px]">mail</span>

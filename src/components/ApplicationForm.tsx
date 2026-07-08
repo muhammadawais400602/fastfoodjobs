@@ -2,7 +2,17 @@
 import { useRef, useState } from "react";
 import Link from "next/link";
 
-export default function ApplicationForm({ jobSlug }: { jobSlug: string }) {
+export default function ApplicationForm({
+  jobSlug,
+  jobId,
+  jobTitle,
+  restaurant,
+}: {
+  jobSlug: string;
+  jobId?: string;
+  jobTitle?: string;
+  restaurant?: string;
+}) {
   const [fileName, setFileName] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -20,6 +30,9 @@ export default function ApplicationForm({ jobSlug }: { jobSlug: string }) {
     setError(null);
     const formData = new FormData(e.currentTarget);
     formData.set("job_slug", jobSlug);
+    if (jobId) formData.set("job_id", jobId);
+    if (jobTitle) formData.set("job_title", jobTitle);
+    if (restaurant) formData.set("restaurant", restaurant);
     try {
       const res = await fetch("/api/applications", { method: "POST", body: formData });
       const json = await res.json();

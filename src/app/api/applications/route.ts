@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { Binary } from "mongodb";
+import { Binary, ObjectId } from "mongodb";
 import { getDb } from "@/lib/mongodb";
 
 const MAX_CV_BYTES = 5 * 1024 * 1024;
@@ -12,6 +12,9 @@ export async function POST(request: Request) {
   const phone = String(formData.get("phone") ?? "").trim();
   const motivation = String(formData.get("motivation") ?? "").trim();
   const jobSlug = String(formData.get("job_slug") ?? "").trim();
+  const jobId = String(formData.get("job_id") ?? "").trim();
+  const jobTitle = String(formData.get("job_title") ?? "").trim();
+  const restaurant = String(formData.get("restaurant") ?? "").trim();
   const cv = formData.get("cv_upload");
 
   if (!fullName || !email || !phone || !motivation) {
@@ -34,6 +37,9 @@ export async function POST(request: Request) {
     const db = await getDb();
     await db.collection("applications").insertOne({
       jobSlug,
+      jobId,
+      jobTitle,
+      restaurant,
       fullName,
       email,
       phone,
@@ -42,6 +48,10 @@ export async function POST(request: Request) {
       status: "new",
       createdAt: new Date(),
     });
+    // Bump the applicant count on the posting.
+    if (jobId && ObjectId.isValid(jobId)) {
+      await db.collection("postings").updateOne({ _id: new ObjectId(jobId) }, { $inc: { applicants: 1 } });
+    }
   } catch (err) {
     console.error("[applications] failed to save:", err);
     return NextResponse.json(
