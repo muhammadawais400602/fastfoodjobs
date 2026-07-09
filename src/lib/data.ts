@@ -75,22 +75,40 @@ export type PostingDoc = {
   _id: string;
   restaurant: string;
   jobTitle: string;
+  department: string;
   jobType: string;
   rate: string;
+  experience: string;
+  shift: string;
+  urgent: boolean;
   description: string;
+  responsibilities: string[];
+  requirements: string[];
+  benefits: string[];
   status: string;
   applicants: number;
   createdAt: string;
 };
+
+function strArray(v: unknown): string[] {
+  return Array.isArray(v) ? v.map((x) => String(x)).filter((x) => x.trim()) : [];
+}
 
 function mapPosting(d: Record<string, unknown>): PostingDoc {
   return {
     _id: (d._id as ObjectId).toString(),
     restaurant: (d.restaurant as string) ?? "",
     jobTitle: (d.jobTitle as string) ?? "",
+    department: (d.department as string) ?? "",
     jobType: (d.jobType as string) ?? "",
     rate: (d.rate as string) ?? "",
+    experience: (d.experience as string) ?? "",
+    shift: (d.shift as string) ?? "",
+    urgent: Boolean(d.urgent),
     description: (d.description as string) ?? "",
+    responsibilities: strArray(d.responsibilities),
+    requirements: strArray(d.requirements),
+    benefits: strArray(d.benefits),
     status: (d.status as string) ?? "pending_review",
     applicants: (d.applicants as number) ?? 0,
     createdAt: (d.createdAt instanceof Date ? d.createdAt : new Date()).toISOString(),

@@ -12,11 +12,41 @@ export type PublicJob = {
   id: string;
   restaurantId: string;
   jobTitle: string;
+  department: string;
   jobType: string;
   rate: string;
+  experience: string;
+  shift: string;
+  urgent: boolean;
   description: string;
+  responsibilities: string[];
+  requirements: string[];
+  benefits: string[];
   status: string;
 };
+
+function strArr(v: unknown): string[] {
+  return Array.isArray(v) ? v.map((x) => String(x)).filter((x) => x.trim()) : [];
+}
+
+function mapJob(d: Record<string, unknown>): PublicJob {
+  return {
+    id: (d._id as ObjectId).toString(),
+    restaurantId: "",
+    jobTitle: (d.jobTitle as string) ?? "",
+    department: (d.department as string) ?? "",
+    jobType: (d.jobType as string) ?? "",
+    rate: (d.rate as string) ?? "",
+    experience: (d.experience as string) ?? "",
+    shift: (d.shift as string) ?? "",
+    urgent: Boolean(d.urgent),
+    description: (d.description as string) ?? "",
+    responsibilities: strArr(d.responsibilities),
+    requirements: strArr(d.requirements),
+    benefits: strArr(d.benefits),
+    status: (d.status as string) ?? "",
+  };
+}
 
 function mapRestaurant(u: Record<string, unknown>): PublicRestaurant {
   const p = (u.profile ?? {}) as Partial<RestaurantProfile>;
@@ -100,15 +130,7 @@ export async function getRestaurantActiveJobs(restaurantName: string): Promise<P
     .find({ restaurant: restaurantName, status: "active" })
     .sort({ createdAt: -1 })
     .toArray();
-  return docs.map((d) => ({
-    id: d._id.toString(),
-    restaurantId: "",
-    jobTitle: d.jobTitle ?? "",
-    jobType: d.jobType ?? "",
-    rate: d.rate ?? "",
-    description: d.description ?? "",
-    status: d.status ?? "",
-  }));
+  return docs.map((d) => mapJob(d as Record<string, unknown>));
 }
 
 export async function getPublicJob(id: string): Promise<{ job: PublicJob; restaurant: PublicRestaurant | null } | null> {
@@ -117,15 +139,7 @@ export async function getPublicJob(id: string): Promise<{ job: PublicJob; restau
   const d = await db.collection("postings").findOne({ _id: new ObjectId(id) });
   if (!d || d.status !== "active") return null;
 
-  const job: PublicJob = {
-    id: d._id.toString(),
-    restaurantId: "",
-    jobTitle: d.jobTitle ?? "",
-    jobType: d.jobType ?? "",
-    rate: d.rate ?? "",
-    description: d.description ?? "",
-    status: d.status ?? "",
-  };
+  const job = mapJob(d as Record<string, unknown>);
 
   // find the owning restaurant account by name
   const owner = await db.collection("users").findOne({ restaurant: d.restaurant });

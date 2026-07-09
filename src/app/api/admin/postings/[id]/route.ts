@@ -12,8 +12,17 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   const body = await request.json().catch(() => ({}));
   const update: Record<string, unknown> = {};
-  for (const key of ["jobTitle", "jobType", "rate", "description", "department"]) {
+  for (const key of ["jobTitle", "jobType", "rate", "description", "department", "experience", "shift"]) {
     if (typeof body[key] === "string") update[key] = body[key].trim();
+  }
+  if (typeof body.urgent === "boolean") update.urgent = body.urgent;
+  const lines = (v: unknown) =>
+    String(v ?? "")
+      .split("\n")
+      .map((s) => s.trim())
+      .filter(Boolean);
+  for (const key of ["responsibilities", "requirements", "benefits"]) {
+    if (typeof body[key] === "string") update[key] = lines(body[key]);
   }
   if (typeof body.status === "string" && ALLOWED_STATUS.includes(body.status)) update.status = body.status;
   if (Object.keys(update).length === 0) {

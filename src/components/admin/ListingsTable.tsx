@@ -37,8 +37,10 @@ export default function ListingsTable({ postings }: { postings: PostingDoc[] }) 
     e.preventDefault();
     if (!editing) return;
     setBusy(true);
-    const data = Object.fromEntries(new FormData(e.currentTarget).entries()) as Record<string, string>;
-    await patch(editing._id, data);
+    const fd = new FormData(e.currentTarget);
+    const data: Record<string, string | boolean> = Object.fromEntries(fd.entries()) as Record<string, string>;
+    data.urgent = fd.get("urgent") === "on";
+    await patch(editing._id, data as Record<string, string>);
     setBusy(false);
     setEditing(null);
   };
@@ -131,17 +133,61 @@ export default function ListingsTable({ postings }: { postings: PostingDoc[] }) 
                 </select>
               </div>
             </div>
-            <div>
-              <label className="text-sm font-semibold text-[#586158]">Hourly Rate</label>
-              <input className={inputClass} name="rate" defaultValue={editing.rate} placeholder="$18 - $24 / hr" />
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="text-sm font-semibold text-[#586158]">Hourly Rate</label>
+                <input className={inputClass} name="rate" defaultValue={editing.rate} placeholder="$18 - $24 / hr" />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-[#586158]">Experience</label>
+                <input className={inputClass} name="experience" defaultValue={editing.experience} placeholder="1+ Years" />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-[#586158]">Shift</label>
+                <input className={inputClass} name="shift" defaultValue={editing.shift} placeholder="Day / Night" />
+              </div>
             </div>
+            <label className="flex items-center gap-2 text-sm font-semibold text-[#586158]">
+              <input type="checkbox" name="urgent" defaultChecked={editing.urgent} className="h-4 w-4 accent-[#b7102a]" />
+              Mark as Urgent Hire
+            </label>
             <div>
-              <label className="text-sm font-semibold text-[#586158]">Description</label>
+              <label className="text-sm font-semibold text-[#586158]">About the Role</label>
               <textarea
                 className="w-full p-3 rounded-lg border border-[#e4bebc] bg-white text-sm outline-none focus:ring-2 focus:ring-[#b7102a] resize-none"
                 name="description"
                 rows={3}
                 defaultValue={editing.description}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-[#586158]">Key Responsibilities</label>
+              <textarea
+                className="w-full p-3 rounded-lg border border-[#e4bebc] bg-white text-sm outline-none focus:ring-2 focus:ring-[#b7102a] resize-none"
+                name="responsibilities"
+                rows={3}
+                defaultValue={editing.responsibilities.join("\n")}
+                placeholder="One per line…"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-[#586158]">Requirements</label>
+              <textarea
+                className="w-full p-3 rounded-lg border border-[#e4bebc] bg-white text-sm outline-none focus:ring-2 focus:ring-[#b7102a] resize-none"
+                name="requirements"
+                rows={3}
+                defaultValue={editing.requirements.join("\n")}
+                placeholder="One per line…"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-[#586158]">Benefits &amp; Perks</label>
+              <textarea
+                className="w-full p-3 rounded-lg border border-[#e4bebc] bg-white text-sm outline-none focus:ring-2 focus:ring-[#b7102a] resize-none"
+                name="benefits"
+                rows={2}
+                defaultValue={editing.benefits.join("\n")}
+                placeholder="One per line…"
               />
             </div>
             <div className="flex justify-end gap-3 pt-2">

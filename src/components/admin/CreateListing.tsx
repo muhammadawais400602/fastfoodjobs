@@ -70,17 +70,59 @@ export default function CreateListing() {
                 </select>
               </div>
             </div>
-            <div>
-              <label className="text-sm font-semibold text-[#586158]">Hourly Rate</label>
-              <input className={inputClass} name="rate" placeholder="$18 - $24 / hr" />
+            <div className="grid grid-cols-3 gap-4">
+              <div>
+                <label className="text-sm font-semibold text-[#586158]">Hourly Rate</label>
+                <input className={inputClass} name="rate" placeholder="$18 - $24 / hr" />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-[#586158]">Experience</label>
+                <input className={inputClass} name="experience" placeholder="1+ Years" />
+              </div>
+              <div>
+                <label className="text-sm font-semibold text-[#586158]">Shift</label>
+                <input className={inputClass} name="shift" placeholder="Day / Night" />
+              </div>
             </div>
+            <label className="flex items-center gap-2 text-sm font-semibold text-[#586158]">
+              <input type="checkbox" name="urgent" className="h-4 w-4 accent-[#b7102a]" />
+              Mark as Urgent Hire
+            </label>
             <div>
-              <label className="text-sm font-semibold text-[#586158]">Description</label>
+              <label className="text-sm font-semibold text-[#586158]">About the Role</label>
               <textarea
                 className="w-full p-3 rounded-lg border border-[#e4bebc] bg-white text-sm outline-none focus:ring-2 focus:ring-[#b7102a] resize-none"
                 name="description"
                 rows={3}
                 placeholder="Describe the role..."
+              />
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-[#586158]">Key Responsibilities</label>
+              <textarea
+                className="w-full p-3 rounded-lg border border-[#e4bebc] bg-white text-sm outline-none focus:ring-2 focus:ring-[#b7102a] resize-none"
+                name="responsibilities"
+                rows={3}
+                placeholder="One per line…"
+              />
+              <p className="text-xs text-[#8f6f6e] mt-1">One item per line.</p>
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-[#586158]">Requirements</label>
+              <textarea
+                className="w-full p-3 rounded-lg border border-[#e4bebc] bg-white text-sm outline-none focus:ring-2 focus:ring-[#b7102a] resize-none"
+                name="requirements"
+                rows={3}
+                placeholder="One per line…"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-semibold text-[#586158]">Benefits &amp; Perks</label>
+              <textarea
+                className="w-full p-3 rounded-lg border border-[#e4bebc] bg-white text-sm outline-none focus:ring-2 focus:ring-[#b7102a] resize-none"
+                name="benefits"
+                rows={2}
+                placeholder="Free Meals, Health Insurance, 401(k) Matching (one per line)"
               />
             </div>
             {error && <p className="text-sm font-semibold text-[#93000a] bg-[#ffdad6] rounded-lg px-4 py-2">{error}</p>}
