@@ -5,6 +5,8 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ApplicationForm from "@/components/ApplicationForm";
 import { getPublicJob } from "@/lib/public";
+import { getSession } from "@/lib/auth";
+import { getCandidate } from "@/lib/candidate";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +23,9 @@ export default async function ApplyJobPage({ params }: Props) {
   const data = await getPublicJob(id);
   if (!data) notFound();
   const { job, restaurant } = data;
+
+  const session = await getSession();
+  const candidate = session?.role === "candidate" ? await getCandidate(session.id) : null;
 
   return (
     <>
@@ -53,6 +58,9 @@ export default async function ApplyJobPage({ params }: Props) {
             jobId={job.id}
             jobTitle={job.jobTitle}
             restaurant={restaurant?.restaurant ?? ""}
+            defaultName={candidate?.name}
+            defaultEmail={candidate?.email}
+            defaultPhone={candidate?.phone}
           />
         </div>
       </main>

@@ -7,11 +7,17 @@ export default function ApplicationForm({
   jobId,
   jobTitle,
   restaurant,
+  defaultName,
+  defaultEmail,
+  defaultPhone,
 }: {
   jobSlug: string;
   jobId?: string;
   jobTitle?: string;
   restaurant?: string;
+  defaultName?: string;
+  defaultEmail?: string;
+  defaultPhone?: string;
 }) {
   const [fileName, setFileName] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
@@ -62,6 +68,7 @@ export default function ApplicationForm({
                   id="full_name"
                   name="full_name"
                   placeholder="John Doe"
+                  defaultValue={defaultName}
                   required
                   type="text"
                 />
@@ -75,6 +82,7 @@ export default function ApplicationForm({
                   id="email"
                   name="email"
                   placeholder="john@example.com"
+                  defaultValue={defaultEmail}
                   required
                   type="email"
                 />
@@ -90,6 +98,7 @@ export default function ApplicationForm({
                 id="phone"
                 name="phone"
                 placeholder="(555) 000-0000"
+                defaultValue={defaultPhone}
                 required
                 type="tel"
               />
