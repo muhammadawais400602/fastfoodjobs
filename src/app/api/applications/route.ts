@@ -33,6 +33,7 @@ export async function POST(request: Request) {
     cvDoc = { name: cv.name, size: cv.size, type: cv.type, data: new Binary(bytes) };
   }
 
+  const chatToken = crypto.randomUUID();
   try {
     const db = await getDb();
     await db.collection("applications").insertOne({
@@ -46,6 +47,7 @@ export async function POST(request: Request) {
       motivation,
       cv: cvDoc,
       status: "new",
+      chatToken,
       createdAt: new Date(),
     });
     // Bump the applicant count on the posting.
@@ -60,5 +62,5 @@ export async function POST(request: Request) {
     );
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, chatUrl: `/chat/${chatToken}` });
 }

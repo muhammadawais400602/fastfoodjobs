@@ -17,6 +17,7 @@ export default function ApplicationForm({
   const [dragActive, setDragActive] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
+  const [chatUrl, setChatUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
@@ -37,6 +38,7 @@ export default function ApplicationForm({
       const res = await fetch("/api/applications", { method: "POST", body: formData });
       const json = await res.json();
       if (!res.ok || !json.ok) throw new Error(json.error ?? "Something went wrong. Please try again.");
+      setChatUrl(json.chatUrl ?? null);
       setSent(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
@@ -197,12 +199,23 @@ export default function ApplicationForm({
             <div>
               <h2 className="text-2xl md:text-[32px] font-bold leading-tight text-on-surface">Application Sent!</h2>
               <p className="text-base text-on-surface-variant mt-2">
-                Thanks for applying to FastFoodJobs. The franchise owner will contact you shortly if it&apos;s a match.
+                Thanks for applying! The restaurant can now message you. Bookmark your chat link to reply to them.
               </p>
             </div>
+            {chatUrl && (
+              <Link
+                href={chatUrl}
+                className="w-full bg-primary text-on-primary h-12 rounded-lg text-sm font-semibold flex items-center justify-center gap-1"
+              >
+                <span className="material-symbols-outlined text-[18px]">chat</span>
+                Open your chat
+              </Link>
+            )}
             <Link
               href="/"
-              className="w-full bg-primary text-on-primary h-12 rounded-lg text-sm font-semibold flex items-center justify-center"
+              className={`w-full h-12 rounded-lg text-sm font-semibold flex items-center justify-center ${
+                chatUrl ? "border border-outline text-on-surface" : "bg-primary text-on-primary"
+              }`}
             >
               Return to Home
             </Link>
