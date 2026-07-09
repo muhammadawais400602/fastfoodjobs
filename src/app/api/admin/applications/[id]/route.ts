@@ -15,6 +15,19 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
   const update: Record<string, unknown> = {};
   if (typeof body.status === "string" && ALLOWED_STATUS.includes(body.status)) update.status = body.status;
   if (typeof body.notes === "string") update.notes = body.notes;
+  if (typeof body.rejectionReason === "string") update.rejectionReason = body.rejectionReason.trim();
+  if (typeof body.interviewAt === "string") update.interviewAt = body.interviewAt;
+  if (typeof body.interviewNote === "string") update.interviewNote = body.interviewNote.trim();
+
+  // Reject requires a reason.
+  if (update.status === "reject" && !String(update.rejectionReason ?? "").trim()) {
+    return NextResponse.json({ ok: false, error: "A rejection reason is required." }, { status: 400 });
+  }
+  // Interview requires a date/time.
+  if (update.status === "interview" && !String(update.interviewAt ?? "").trim()) {
+    return NextResponse.json({ ok: false, error: "An interview date and time is required." }, { status: 400 });
+  }
+
   if (Object.keys(update).length === 0) {
     return NextResponse.json({ ok: false, error: "Nothing to update." }, { status: 400 });
   }

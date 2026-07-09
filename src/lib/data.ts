@@ -12,6 +12,9 @@ export type ApplicationDoc = {
   motivation: string;
   status: string;
   notes?: string;
+  rejectionReason?: string;
+  interviewAt?: string;
+  interviewNote?: string;
   hasCv: boolean;
   createdAt: string;
 };
@@ -43,6 +46,9 @@ function mapApplication(d: Record<string, unknown>): ApplicationDoc {
     motivation: (d.motivation as string) ?? "",
     status: (d.status as string) ?? "new",
     notes: (d.notes as string) ?? "",
+    rejectionReason: (d.rejectionReason as string) ?? "",
+    interviewAt: d.interviewAt instanceof Date ? d.interviewAt.toISOString() : (d.interviewAt as string) ?? "",
+    interviewNote: (d.interviewNote as string) ?? "",
     hasCv: Boolean(d.cv),
     createdAt: (d.createdAt instanceof Date ? d.createdAt : new Date()).toISOString(),
   };

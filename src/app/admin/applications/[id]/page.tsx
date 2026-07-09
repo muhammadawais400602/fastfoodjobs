@@ -109,7 +109,30 @@ export default async function ApplicantDetailPage({ params }: { params: Promise<
         </div>
 
         <div className="col-span-12 lg:col-span-4">
-          <ApplicantActions id={app._id} currentStatus={app.status} currentNotes={app.notes ?? ""} />
+          {app.status === "interview" && app.interviewAt && (
+            <div className="bg-[#c7e7ff]/40 border border-[#286182]/20 rounded-xl p-5 mb-6">
+              <p className="text-xs font-bold uppercase tracking-wider text-[#286182] mb-1 flex items-center gap-1">
+                <span className="material-symbols-outlined text-[16px]">event_available</span> Interview Scheduled
+              </p>
+              <p className="text-base font-semibold">{new Date(app.interviewAt).toLocaleString()}</p>
+              {app.interviewNote && <p className="text-sm text-[#586158] mt-2 whitespace-pre-line">{app.interviewNote}</p>}
+            </div>
+          )}
+          {app.status === "reject" && app.rejectionReason && (
+            <div className="bg-[#ffdad6] border border-[#ba1a1a]/20 rounded-xl p-5 mb-6">
+              <p className="text-xs font-bold uppercase tracking-wider text-[#93000a] mb-1 flex items-center gap-1">
+                <span className="material-symbols-outlined text-[16px]">cancel</span> Rejection Reason
+              </p>
+              <p className="text-sm text-[#93000a] whitespace-pre-line">{app.rejectionReason}</p>
+            </div>
+          )}
+          <ApplicantActions
+            id={app._id}
+            email={app.email}
+            applicantName={app.fullName}
+            currentStatus={app.status}
+            currentNotes={app.notes ?? ""}
+          />
         </div>
       </div>
     </AdminShell>
