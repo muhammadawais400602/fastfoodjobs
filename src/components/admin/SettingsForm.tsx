@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AMENITY_OPTIONS, type RestaurantProfile } from "@/lib/profile";
 
@@ -15,6 +15,78 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
     >
       <span className={`absolute top-[2px] left-[2px] bg-white rounded-full h-4 w-4 transition-transform ${checked ? "translate-x-4" : ""}`} />
     </button>
+  );
+}
+
+function ImageUpload({
+  label,
+  value,
+  onChange,
+  aspect,
+}: {
+  label: string;
+  value: string;
+  onChange: (url: string) => void;
+  aspect: "square" | "cover";
+}) {
+  const input = useRef<HTMLInputElement>(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+
+  const upload = async (file: File) => {
+    setBusy(true);
+    setErr(null);
+    const fd = new FormData();
+    fd.set("file", file);
+    try {
+      const res = await fetch("/api/admin/media", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok || !json.ok) throw new Error(json.error ?? "Upload failed.");
+      onChange(json.url);
+    } catch (e) {
+      setErr(e instanceof Error ? e.message : "Upload failed.");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="space-y-2">
+      <label className="text-sm font-semibold">{label}</label>
+      <div
+        onClick={() => input.current?.click()}
+        className={`relative cursor-pointer border-2 border-dashed border-[#e4bebc] rounded-xl overflow-hidden hover:border-[#b7102a] transition-colors bg-white flex items-center justify-center ${
+          aspect === "square" ? "aspect-square max-w-[160px]" : "h-40"
+        }`}
+      >
+        {value ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={value} alt={label} className={aspect === "square" ? "w-full h-full object-contain p-2" : "w-full h-full object-cover"} />
+        ) : (
+          <div className="text-center p-4 text-[#8f6f6e]">
+            <span className="material-symbols-outlined text-[32px] text-[#b7102a]">upload</span>
+            <p className="text-xs font-semibold mt-1">{busy ? "Uploading…" : "Click to upload"}</p>
+            <p className="text-[10px]">PNG, JPG up to 4MB</p>
+          </div>
+        )}
+        {value && (
+          <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity">
+            <span className="text-white text-xs font-semibold flex items-center gap-1">
+              <span className="material-symbols-outlined text-[18px]">photo_camera</span>
+              {busy ? "Uploading…" : "Change"}
+            </span>
+          </div>
+        )}
+        <input
+          ref={input}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])}
+        />
+      </div>
+      {err && <p className="text-xs font-semibold text-[#93000a]">{err}</p>}
+    </div>
   );
 }
 
@@ -152,14 +224,8 @@ export default function SettingsForm({ profile, email }: { profile: RestaurantPr
             <p className="text-xs text-[#8f6f6e]">One line per day range — shown on your public page.</p>
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-semibold">Logo Image URL</label>
-            <input className={inputClass} value={form.logoUrl} onChange={(e) => set({ logoUrl: e.target.value })} placeholder="https://…/logo.png" />
-          </div>
-          <div className="space-y-2">
-            <label className="text-sm font-semibold">Cover Photo URL</label>
-            <input className={inputClass} value={form.coverUrl} onChange={(e) => set({ coverUrl: e.target.value })} placeholder="https://…/cover.jpg" />
-          </div>
+          <ImageUpload label="Restaurant Logo" value={form.logoUrl} onChange={(url) => set({ logoUrl: url })} aspect="square" />
+          <ImageUpload label="Cover Photo" value={form.coverUrl} onChange={(url) => set({ coverUrl: url })} aspect="cover" />
         </div>
 
         {/* Amenities */}
