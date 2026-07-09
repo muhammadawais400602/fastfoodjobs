@@ -9,7 +9,15 @@ function secret() {
   return new TextEncoder().encode(s);
 }
 
-export type SessionUser = { id: string; email: string; restaurant: string };
+export type Role = "restaurant" | "candidate";
+
+export type SessionUser = {
+  id: string;
+  email: string;
+  role: Role;
+  restaurant: string; // restaurant name (restaurant accounts) or ""
+  name: string; // display name (candidate accounts) or restaurant name
+};
 
 export async function createSession(user: SessionUser, remember: boolean) {
   const maxAge = remember ? 60 * 60 * 24 * 30 : 60 * 60 * 24;
@@ -40,7 +48,14 @@ export async function getSession(): Promise<SessionUser | null> {
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, secret());
-    return { id: String(payload.id), email: String(payload.email), restaurant: String(payload.restaurant) };
+    const role = (payload.role as Role) === "candidate" ? "candidate" : "restaurant";
+    return {
+      id: String(payload.id),
+      email: String(payload.email),
+      role,
+      restaurant: String(payload.restaurant ?? ""),
+      name: String(payload.name ?? payload.restaurant ?? ""),
+    };
   } catch {
     return null;
   }

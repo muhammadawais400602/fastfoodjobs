@@ -7,11 +7,12 @@ export async function POST(request: Request) {
   const body = await request.json().catch(() => null);
   if (!body) return NextResponse.json({ ok: false, error: "Invalid request." }, { status: 400 });
 
+  const role = body.role === "candidate" ? "candidate" : "restaurant";
   const email = String(body.email ?? "").trim().toLowerCase();
   const password = String(body.password ?? "");
-  const restaurant = String(body.restaurant ?? "").trim();
+  const name = String(body.name ?? body.restaurant ?? "").trim();
 
-  if (!email || !password || !restaurant) {
+  if (!email || !password || !name) {
     return NextResponse.json({ ok: false, error: "All fields are required." }, { status: 400 });
   }
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
@@ -23,18 +24,31 @@ export async function POST(request: Request) {
 
   try {
     const db = await getDb();
-    const users = db.collection("users");
-    const existing = await users.findOne({ email });
+    const collection = role === "candidate" ? "candidates" : "users";
+    const existing = await db.collection(collection).findOne({ email });
     if (existing) {
       return NextResponse.json({ ok: false, error: "An account with that email already exists." }, { status: 409 });
     }
     const passwordHash = await bcrypt.hash(password, 10);
-    const result = await users.insertOne({ email, passwordHash, restaurant, createdAt: new Date() });
-    await createSession({ id: result.insertedId.toString(), email, restaurant }, false);
+
+    if (role === "candidate") {
+      const result = await db.collection("candidates").insertOne({
+        email,
+        passwordHash,
+        name,
+        savedJobs: [],
+        careerStatus: "looking",
+        createdAt: new Date(),
+      });
+      await createSession({ id: result.insertedId.toString(), email, role: "candidate", restaurant: "", name }, false);
+    } else {
+      const result = await db.collection("users").insertOne({ email, passwordHash, restaurant: name, createdAt: new Date() });
+      await createSession({ id: result.insertedId.toString(), email, role: "restaurant", restaurant: name, name }, false);
+    }
   } catch (err) {
     console.error("[register]", err);
     return NextResponse.json({ ok: false, error: "Couldn't create the account. Please try again." }, { status: 500 });
   }
 
-  return NextResponse.json({ ok: true });
+  return NextResponse.json({ ok: true, role });
 }

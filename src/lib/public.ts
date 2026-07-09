@@ -101,6 +101,26 @@ export async function getAllActiveJobs(): Promise<JobCard[]> {
   }));
 }
 
+// Fetch specific jobs by id (for a candidate's saved list). Keeps only active ones.
+export async function getJobsByIds(ids: string[]): Promise<JobCard[]> {
+  const objIds = ids.filter((id) => ObjectId.isValid(id)).map((id) => new ObjectId(id));
+  if (objIds.length === 0) return [];
+  const db = await getDb();
+  const postings = await db.collection("postings").find({ _id: { $in: objIds }, status: "active" }).toArray();
+  const owners = await db.collection("users").find({}).project({ restaurant: 1 }).toArray();
+  const idByName = new Map<string, string>();
+  for (const o of owners) idByName.set(o.restaurant, o._id.toString());
+  return postings.map((d) => ({
+    id: d._id.toString(),
+    jobTitle: d.jobTitle ?? "",
+    jobType: d.jobType ?? "",
+    rate: d.rate ?? "",
+    description: d.description ?? "",
+    restaurant: d.restaurant ?? "",
+    restaurantId: idByName.get(d.restaurant) ?? "",
+  }));
+}
+
 // Restaurants that currently have at least one active job.
 export async function getRestaurantsWithActiveJobs(): Promise<{ id: string; name: string; jobCount: number }[]> {
   const db = await getDb();

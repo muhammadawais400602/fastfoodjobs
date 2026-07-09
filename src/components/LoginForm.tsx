@@ -2,11 +2,14 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+type Role = "candidate" | "restaurant";
+
 export default function LoginForm() {
   const router = useRouter();
   const params = useSearchParams();
-  const next = params.get("next") || "/admin";
+  const nextParam = params.get("next");
 
+  const [role, setRole] = useState<Role>("candidate");
   const [mode, setMode] = useState<"login" | "register">("login");
   const [showPass, setShowPass] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -22,11 +25,12 @@ export default function LoginForm() {
       const res = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, remember: data.remember === "on" }),
+        body: JSON.stringify({ ...data, role, remember: data.remember === "on" }),
       });
       const json = await res.json();
       if (!res.ok || !json.ok) throw new Error(json.error ?? "Something went wrong.");
-      router.push(next);
+      const dest = nextParam ?? (role === "candidate" ? "/candidate" : "/admin");
+      router.push(dest);
       router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.");
@@ -39,28 +43,46 @@ export default function LoginForm() {
 
   return (
     <div className="bg-surface-container-lowest shadow-[0px_4px_20px_rgba(29,53,87,0.05)] rounded-xl p-8 md:p-10 border border-outline-variant">
-      <div className="text-center mb-8">
-        <h1 className="text-[40px] md:text-[48px] font-extrabold leading-tight tracking-[-0.02em] text-primary mb-2">
+      <div className="text-center mb-6">
+        <h1 className="text-[36px] md:text-[44px] font-extrabold leading-tight tracking-[-0.02em] text-primary mb-2">
           {mode === "login" ? "Welcome Back" : "Create Account"}
         </h1>
         <p className="text-base text-on-surface-variant">
-          {mode === "login"
-            ? "Manage your restaurant's hiring in one place."
-            : "Set up your restaurant's recruitment portal."}
+          {role === "candidate" ? "Find your next shift and manage your applications." : "Manage your restaurant's hiring."}
         </p>
       </div>
 
-      <form className="space-y-6" onSubmit={handleSubmit}>
+      {/* Role toggle */}
+      <div className="grid grid-cols-2 gap-2 p-1 bg-surface-container rounded-xl mb-6">
+        {(["candidate", "restaurant"] as Role[]).map((r) => (
+          <button
+            key={r}
+            type="button"
+            onClick={() => {
+              setRole(r);
+              setError(null);
+            }}
+            className={`py-2.5 rounded-lg text-sm font-semibold transition-all flex items-center justify-center gap-1 ${
+              role === r ? "bg-white text-primary shadow-sm" : "text-on-surface-variant"
+            }`}
+          >
+            <span className="material-symbols-outlined text-[18px]">{r === "candidate" ? "person" : "storefront"}</span>
+            {r === "candidate" ? "Job Seeker" : "Restaurant"}
+          </button>
+        ))}
+      </div>
+
+      <form className="space-y-5" onSubmit={handleSubmit}>
         {mode === "register" && (
           <div className="space-y-2">
-            <label className="block text-sm font-semibold text-on-surface" htmlFor="restaurant">
-              Restaurant Name
+            <label className="block text-sm font-semibold text-on-surface" htmlFor="name">
+              {role === "candidate" ? "Full Name" : "Restaurant Name"}
             </label>
             <div className="relative">
               <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">
-                storefront
+                {role === "candidate" ? "badge" : "storefront"}
               </span>
-              <input className={inputClass} id="restaurant" name="restaurant" placeholder="The Grand Bistro" required />
+              <input className={inputClass} id="name" name="name" placeholder={role === "candidate" ? "Alex Rivera" : "The Grand Bistro"} required />
             </div>
           </div>
         )}
@@ -70,23 +92,17 @@ export default function LoginForm() {
             Email Address
           </label>
           <div className="relative">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">
-              mail
-            </span>
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">mail</span>
             <input className={inputClass} id="email" name="email" placeholder="name@company.com" type="email" required />
           </div>
         </div>
 
         <div className="space-y-2">
-          <div className="flex justify-between items-center">
-            <label className="block text-sm font-semibold text-on-surface" htmlFor="password">
-              Password
-            </label>
-          </div>
+          <label className="block text-sm font-semibold text-on-surface" htmlFor="password">
+            Password
+          </label>
           <div className="relative">
-            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">
-              lock
-            </span>
+            <span className="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant">lock</span>
             <input
               className="w-full pl-10 pr-10 py-3 bg-white border border-outline rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition-all text-base"
               id="password"
@@ -108,12 +124,7 @@ export default function LoginForm() {
 
         {mode === "login" && (
           <div className="flex items-center">
-            <input
-              className="w-4 h-4 text-primary border-outline rounded focus:ring-primary cursor-pointer accent-primary"
-              id="remember"
-              name="remember"
-              type="checkbox"
-            />
+            <input className="w-4 h-4 rounded accent-primary" id="remember" name="remember" type="checkbox" />
             <label className="ml-2 text-sm font-semibold text-on-surface-variant cursor-pointer" htmlFor="remember">
               Remember me for 30 days
             </label>
@@ -131,7 +142,7 @@ export default function LoginForm() {
         </button>
       </form>
 
-      <div className="mt-8 text-center">
+      <div className="mt-6 text-center">
         <p className="text-sm text-on-surface-variant">
           {mode === "login" ? "Don't have an account yet?" : "Already have an account?"}
           <button
