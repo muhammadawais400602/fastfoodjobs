@@ -46,8 +46,9 @@ export default function AddTeamMember() {
       {open && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 animate-fade-in">
           <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
-          <form onSubmit={submit} className="relative bg-white rounded-xl w-full max-w-lg p-6 md:p-8 shadow-2xl space-y-4 max-h-[90dvh] overflow-y-auto animate-scale-in">
-            <h3 className="text-2xl font-bold sticky -top-6 md:-top-8 -mx-6 md:-mx-8 -mt-6 md:-mt-8 px-6 md:px-8 pt-6 md:pt-8 pb-3 bg-white z-10 rounded-t-xl border-b border-[#e4bebc]/50">Add Team Member</h3>
+          <form onSubmit={submit} className="relative bg-white rounded-xl w-full max-w-lg shadow-2xl max-h-[90dvh] flex flex-col overflow-hidden animate-scale-in">
+            <h3 className="text-2xl font-bold px-6 md:px-8 pt-6 pb-4 border-b border-[#e4bebc]/50 shrink-0">Add Team Member</h3>
+            <div className="overflow-y-auto px-6 md:px-8 py-4 space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-semibold text-[#586158]">Name</label>
@@ -90,6 +91,7 @@ export default function AddTeamMember() {
                 {submitting ? "Adding…" : "Add Member"}
               </button>
             </div>
+          </div>
           </form>
         </div>
       )}
