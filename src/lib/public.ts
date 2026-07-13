@@ -85,12 +85,21 @@ function freshCutoff(): Date {
   return new Date(Date.now() - LISTING_TTL_DAYS * 24 * 60 * 60 * 1000);
 }
 
+// What counts as a publicly visible job: not draft/closed, and either recent
+// or missing a proper posted date (legacy data is kept visible).
+function publicJobFilter(): Record<string, unknown> {
+  return {
+    status: { $nin: ["draft", "closed"] },
+    $or: [{ createdAt: { $gte: freshCutoff() } }, { createdAt: { $not: { $type: "date" } } }],
+  };
+}
+
 // All active jobs across every restaurant, with the owning restaurant's id resolved.
 export async function getAllActiveJobs(): Promise<JobCard[]> {
   const db = await getDb();
   const postings = await db
     .collection("postings")
-    .find({ status: "active", createdAt: { $gte: freshCutoff() } })
+    .find(publicJobFilter())
     .sort({ createdAt: -1 })
     .limit(200)
     .toArray();
@@ -115,7 +124,7 @@ export async function getJobsByIds(ids: string[]): Promise<JobCard[]> {
   const objIds = ids.filter((id) => ObjectId.isValid(id)).map((id) => new ObjectId(id));
   if (objIds.length === 0) return [];
   const db = await getDb();
-  const postings = await db.collection("postings").find({ _id: { $in: objIds }, status: "active", createdAt: { $gte: freshCutoff() } }).toArray();
+  const postings = await db.collection("postings").find({ _id: { $in: objIds }, ...publicJobFilter() }).toArray();
   const owners = await db.collection("users").find({}).project({ restaurant: 1 }).toArray();
   const idByName = new Map<string, string>();
   for (const o of owners) idByName.set(o.restaurant, o._id.toString());
@@ -134,8 +143,10 @@ export type RestaurantCardData = {
   id: string;
   name: string;
   jobCount: number;
+  jobTypes: string[];
   tagline: string;
   description: string;
+  address: string;
   city: string;
   cuisine: string;
   logoUrl: string;
@@ -149,14 +160,18 @@ export async function getRestaurantsWithActiveJobs(): Promise<RestaurantCardData
     db
       .collection("postings")
       .aggregate([
-        { $match: { status: "active", createdAt: { $gte: freshCutoff() } } },
-        { $group: { _id: "$restaurant", jobCount: { $sum: 1 } } },
+        { $match: publicJobFilter() },
+        { $group: { _id: "$restaurant", jobCount: { $sum: 1 }, jobTypes: { $addToSet: "$jobType" } } },
       ])
       .toArray(),
   ]);
 
-  const countByName = new Map<string, number>();
-  for (const g of grouped) countByName.set(g._id as string, g.jobCount as number);
+  const countByName = new Map<string, { count: number; types: string[] }>();
+  for (const g of grouped)
+    countByName.set(g._id as string, {
+      count: g.jobCount as number,
+      types: ((g.jobTypes as unknown[]) ?? []).map((t) => String(t)).filter(Boolean),
+    });
 
   return owners
     .filter((o) => o.restaurant)
@@ -165,9 +180,11 @@ export async function getRestaurantsWithActiveJobs(): Promise<RestaurantCardData
       return {
         id: o._id.toString(),
         name: o.restaurant as string,
-        jobCount: countByName.get(o.restaurant as string) ?? 0,
+        jobCount: countByName.get(o.restaurant as string)?.count ?? 0,
+        jobTypes: countByName.get(o.restaurant as string)?.types ?? [],
         tagline: p.tagline ?? "",
         description: p.description ?? "",
+        address: p.address ?? "",
         city: p.city ?? "",
         cuisine: p.cuisine ?? "",
         logoUrl: p.logoUrl ?? "",
@@ -180,7 +197,7 @@ export async function getRestaurantActiveJobs(restaurantName: string): Promise<P
   const db = await getDb();
   const docs = await db
     .collection("postings")
-    .find({ restaurant: restaurantName, status: "active", createdAt: { $gte: freshCutoff() } })
+    .find({ restaurant: restaurantName, ...publicJobFilter() })
     .sort({ createdAt: -1 })
     .toArray();
   return docs.map((d) => mapJob(d as Record<string, unknown>));
