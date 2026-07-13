@@ -2,8 +2,12 @@ import { NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { getDb } from "@/lib/mongodb";
 import { createSession } from "@/lib/auth";
+import { rateLimit, clientIp } from "@/lib/ratelimit";
 
 export async function POST(request: Request) {
+  if (!rateLimit(`login:${clientIp(request)}`, 10, 60_000)) {
+    return NextResponse.json({ ok: false, error: "Too many attempts. Please wait a minute and try again." }, { status: 429 });
+  }
   const body = await request.json().catch(() => null);
   if (!body) return NextResponse.json({ ok: false, error: "Invalid request." }, { status: 400 });
 

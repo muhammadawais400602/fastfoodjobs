@@ -31,9 +31,9 @@ export default async function DashboardPage() {
 
   return (
     <AdminShell active="Dashboard" title="Recruitment Overview" subtitle="Manage your workforce and talent pipeline.">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-8 stagger-children">
         {cards.map((c) => (
-          <div key={c.label} className="bg-white p-6 rounded-xl border border-[#e4bebc] shadow-[0px_4px_20px_rgba(29,53,87,0.05)]">
+          <div key={c.label} className="bg-white p-6 rounded-xl border border-[#e4bebc] shadow-[0px_4px_20px_rgba(29,53,87,0.05)] card-lift">
             <div className={`inline-flex p-3 rounded-lg mb-4 ${c.tint}`}>
               <span className="material-symbols-outlined">{c.icon}</span>
             </div>
@@ -53,7 +53,8 @@ export default async function DashboardPage() {
         {recent.length === 0 ? (
           <p className="px-6 py-12 text-center text-[#586158]">No applications yet.</p>
         ) : (
-          <table className="w-full">
+          <div className="overflow-x-auto">
+          <table className="w-full min-w-[640px]">
             <thead>
               <tr className="bg-[#f0f3ff] text-[#586158] uppercase text-xs font-semibold text-left">
                 <th className="px-6 py-4">Applicant</th>
@@ -83,6 +84,7 @@ export default async function DashboardPage() {
               ))}
             </tbody>
           </table>
+          </div>
         )}
       </div>
     </AdminShell>

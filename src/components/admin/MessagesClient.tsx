@@ -7,13 +7,21 @@ function initials(name: string) {
 }
 
 export default function MessagesClient({ candidates }: { candidates: Candidate[] }) {
-  const [selected, setSelected] = useState<Candidate | null>(candidates[0] ?? null);
+  const [selected, setSelected] = useState<Candidate | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const [copied, setCopied] = useState(false);
   const [query, setQuery] = useState("");
   const bottomRef = useRef<HTMLDivElement>(null);
+
+  // Auto-open the first thread on desktop; on mobile keep the list visible.
+  useEffect(() => {
+    if (candidates.length > 0 && window.matchMedia("(min-width: 768px)").matches) {
+      setSelected(candidates[0]);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const loadThread = async (id: string) => {
     const res = await fetch(`/api/admin/messages?applicationId=${id}`);
@@ -60,9 +68,11 @@ export default function MessagesClient({ candidates }: { candidates: Candidate[]
   );
 
   return (
-    <div className="flex h-[calc(100vh-13rem)] rounded-xl overflow-hidden border border-[#e4bebc] bg-white">
-      {/* Candidate list */}
-      <section className="w-[320px] border-r border-[#e4bebc] flex flex-col">
+    <div className="flex h-[calc(100dvh-11rem)] md:h-[calc(100vh-13rem)] rounded-xl overflow-hidden border border-[#e4bebc] bg-white">
+      {/* Candidate list — full width on mobile, hidden when a chat is open */}
+      <section
+        className={`w-full md:w-[320px] md:border-r border-[#e4bebc] flex-col ${selected ? "hidden md:flex" : "flex"}`}
+      >
         <div className="p-4 border-b border-[#e4bebc]">
           <input
             value={query}
@@ -97,29 +107,36 @@ export default function MessagesClient({ candidates }: { candidates: Candidate[]
         </div>
       </section>
 
-      {/* Conversation */}
-      <section className="flex-1 flex flex-col bg-[#fbfbff]">
+      {/* Conversation — full width on mobile once opened */}
+      <section className={`flex-1 flex-col bg-[#fbfbff] ${selected ? "flex" : "hidden md:flex"}`}>
         {!selected ? (
           <div className="flex-1 flex items-center justify-center text-[#586158]">Select a candidate to start chatting.</div>
         ) : (
           <>
-            <div className="px-6 py-3 border-b border-[#e4bebc] flex justify-between items-center bg-white">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#b7102a]/10 text-[#b7102a] font-bold flex items-center justify-center">
+            <div className="px-4 md:px-6 py-3 border-b border-[#e4bebc] flex justify-between items-center gap-2 bg-white">
+              <div className="flex items-center gap-3 min-w-0">
+                <button
+                  onClick={() => setSelected(null)}
+                  className="md:hidden text-[#183153] -ml-1"
+                  aria-label="Back to candidate list"
+                >
+                  <span className="material-symbols-outlined">arrow_back</span>
+                </button>
+                <div className="w-10 h-10 rounded-full bg-[#b7102a]/10 text-[#b7102a] font-bold flex items-center justify-center shrink-0">
                   {initials(selected.name)}
                 </div>
-                <div>
-                  <p className="font-bold">{selected.name}</p>
-                  <p className="text-xs text-[#586158]">{selected.position} applicant</p>
+                <div className="min-w-0">
+                  <p className="font-bold truncate">{selected.name}</p>
+                  <p className="text-xs text-[#586158] truncate">{selected.position} applicant</p>
                 </div>
               </div>
               <button
                 onClick={copyLink}
-                className="px-4 py-2 border border-[#e4bebc] rounded-lg text-sm font-semibold hover:bg-[#f0f3ff] transition-colors flex items-center gap-1"
+                className="px-3 md:px-4 py-2 border border-[#e4bebc] rounded-lg text-sm font-semibold hover:bg-[#f0f3ff] transition-colors flex items-center gap-1 shrink-0"
                 title="Copy the private chat link to send to this applicant"
               >
                 <span className="material-symbols-outlined text-[18px]">link</span>
-                {copied ? "Copied!" : "Copy chat link"}
+                <span className="hidden sm:inline">{copied ? "Copied!" : "Copy chat link"}</span>
               </button>
             </div>
 
@@ -132,7 +149,7 @@ export default function MessagesClient({ candidates }: { candidates: Candidate[]
                 messages.map((m) => (
                   <div key={m._id} className={`flex ${m.sender === "restaurant" ? "justify-end" : "justify-start"}`}>
                     <div
-                      className={`max-w-[75%] p-4 rounded-2xl ${
+                      className={`max-w-[85%] md:max-w-[75%] p-3 md:p-4 rounded-2xl animate-scale-in ${
                         m.sender === "restaurant"
                           ? "bg-[#b7102a] text-white rounded-br-none"
                           : "bg-white border border-[#e4bebc] rounded-bl-none"

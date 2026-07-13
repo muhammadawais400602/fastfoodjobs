@@ -1,14 +1,26 @@
 import { NextResponse } from "next/server";
 import { Binary, ObjectId } from "mongodb";
 import { getDb } from "@/lib/mongodb";
+import { rateLimit, clientIp } from "@/lib/ratelimit";
 
 const MAX_CV_BYTES = 5 * 1024 * 1024;
+const ALLOWED_CV_TYPES = [
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+];
 
 export async function POST(request: Request) {
+  if (!rateLimit(`apply:${clientIp(request)}`, 5, 60_000)) {
+    return NextResponse.json(
+      { ok: false, error: "Too many applications from your connection. Please wait a minute." },
+      { status: 429 }
+    );
+  }
   const formData = await request.formData();
 
   const fullName = String(formData.get("full_name") ?? "").trim();
-  const email = String(formData.get("email") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim().toLowerCase();
   const phone = String(formData.get("phone") ?? "").trim();
   const motivation = String(formData.get("motivation") ?? "").trim();
   const jobSlug = String(formData.get("job_slug") ?? "").trim();
@@ -26,6 +38,12 @@ export async function POST(request: Request) {
   if (cv instanceof File && cv.size > MAX_CV_BYTES) {
     return NextResponse.json({ ok: false, error: "CV must be 5MB or smaller." }, { status: 400 });
   }
+  if (cv instanceof File && cv.size > 0 && !ALLOWED_CV_TYPES.includes(cv.type)) {
+    return NextResponse.json({ ok: false, error: "CV must be a PDF or Word document." }, { status: 400 });
+  }
+  if (fullName.length > 120 || email.length > 254 || phone.length > 40 || motivation.length > 5000) {
+    return NextResponse.json({ ok: false, error: "One of the fields is too long." }, { status: 400 });
+  }
 
   let cvDoc: { name: string; size: number; type: string; data: Binary } | null = null;
   if (cv instanceof File && cv.size > 0) {
@@ -36,6 +54,15 @@ export async function POST(request: Request) {
   const chatToken = crypto.randomUUID();
   try {
     const db = await getDb();
+    if (jobId) {
+      const dup = await db.collection("applications").findOne({ jobId, email: email.toLowerCase() });
+      if (dup) {
+        return NextResponse.json(
+          { ok: false, error: "You've already applied for this job. The restaurant can reach you in your existing chat." },
+          { status: 409 }
+        );
+      }
+    }
     await db.collection("applications").insertOne({
       jobSlug,
       jobId,
