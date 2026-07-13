@@ -168,7 +168,7 @@ export default function ApplicantActions({
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 animate-fade-in">
           <div className="absolute inset-0 bg-black/40" onClick={() => setModal(null)} />
           <div className="relative bg-white rounded-xl w-full max-w-md p-6 md:p-8 shadow-2xl space-y-4 animate-scale-in max-h-[90dvh] overflow-y-auto">
-            <h3 className="text-2xl font-bold">Move to Interview</h3>
+            <h3 className="text-2xl font-bold sticky -top-6 md:-top-8 -mx-6 md:-mx-8 -mt-6 md:-mt-8 px-6 md:px-8 pt-6 md:pt-8 pb-3 bg-white z-10 rounded-t-xl border-b border-[#e4bebc]/50">Move to Interview</h3>
             <p className="text-sm text-[#586158]">Schedule {applicantName} for an interview, or chat by email.</p>
             <div>
               <label className="text-sm font-semibold text-[#586158]">Interview date &amp; time</label>
@@ -215,7 +215,7 @@ export default function ApplicantActions({
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 animate-fade-in">
           <div className="absolute inset-0 bg-black/40" onClick={() => setModal(null)} />
           <div className="relative bg-white rounded-xl w-full max-w-md p-6 md:p-8 shadow-2xl space-y-4 animate-scale-in max-h-[90dvh] overflow-y-auto">
-            <h3 className="text-2xl font-bold">Reject Applicant</h3>
+            <h3 className="text-2xl font-bold sticky -top-6 md:-top-8 -mx-6 md:-mx-8 -mt-6 md:-mt-8 px-6 md:px-8 pt-6 md:pt-8 pb-3 bg-white z-10 rounded-t-xl border-b border-[#e4bebc]/50">Reject Applicant</h3>
             <p className="text-sm text-[#586158]">Add a reason — this is kept for your records.</p>
             <textarea
               value={reason}

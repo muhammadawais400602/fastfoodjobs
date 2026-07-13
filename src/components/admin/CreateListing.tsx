@@ -51,7 +51,7 @@ export default function CreateListing() {
             onSubmit={(e) => submit(e, "active")}
             className="relative bg-white rounded-xl w-full max-w-lg p-6 md:p-8 shadow-2xl space-y-4 max-h-[90dvh] overflow-y-auto animate-scale-in"
           >
-            <h3 className="text-2xl font-bold">Create Job Listing</h3>
+            <h3 className="text-2xl font-bold sticky -top-6 md:-top-8 -mx-6 md:-mx-8 -mt-6 md:-mt-8 px-6 md:px-8 pt-6 md:pt-8 pb-3 bg-white z-10 rounded-t-xl border-b border-[#e4bebc]/50">Create Job Listing</h3>
             <div>
               <label className="text-sm font-semibold text-[#586158]">Job Title</label>
               <input className={inputClass} name="jobTitle" placeholder="Shift Manager" required />
