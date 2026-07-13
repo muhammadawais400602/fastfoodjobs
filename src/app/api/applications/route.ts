@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { Binary, ObjectId } from "mongodb";
 import { getDb } from "@/lib/mongodb";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
+import { notifyRestaurantNewApplication } from "@/lib/email";
 
 const MAX_CV_BYTES = 5 * 1024 * 1024;
 const ALLOWED_CV_TYPES = [
@@ -80,6 +81,13 @@ export async function POST(request: Request) {
     // Bump the applicant count on the posting.
     if (jobId && ObjectId.isValid(jobId)) {
       await db.collection("postings").updateOne({ _id: new ObjectId(jobId) }, { $inc: { applicants: 1 } });
+    }
+    // Notify the restaurant owner (their login email) — fire-and-forget.
+    if (restaurant) {
+      const owner = await db.collection("users").findOne({ restaurant });
+      if (owner?.email) {
+        notifyRestaurantNewApplication({ to: owner.email, applicantName: fullName, jobTitle });
+      }
     }
   } catch (err) {
     console.error("[applications] failed to save:", err);

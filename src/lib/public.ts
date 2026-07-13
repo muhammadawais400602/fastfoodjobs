@@ -23,6 +23,7 @@ export type PublicJob = {
   requirements: string[];
   benefits: string[];
   status: string;
+  createdAt: string;
 };
 
 function strArr(v: unknown): string[] {
@@ -45,6 +46,7 @@ function mapJob(d: Record<string, unknown>): PublicJob {
     requirements: strArr(d.requirements),
     benefits: strArr(d.benefits),
     status: (d.status as string) ?? "",
+    createdAt: (d.createdAt instanceof Date ? d.createdAt : new Date()).toISOString(),
   };
 }
 

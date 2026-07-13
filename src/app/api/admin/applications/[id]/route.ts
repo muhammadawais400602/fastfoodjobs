@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { getDb } from "@/lib/mongodb";
 import { getSession } from "@/lib/auth";
+import { notifyApplicantStatus } from "@/lib/email";
 
 const ALLOWED_STATUS = ["new", "reviewed", "interview", "hire", "reject"];
 
@@ -34,7 +35,23 @@ export async function PATCH(request: Request, { params }: { params: Promise<{ id
 
   try {
     const db = await getDb();
+    const app = await db.collection("applications").findOne({ _id: new ObjectId(id) });
+    if (!app) return NextResponse.json({ ok: false, error: "Not found." }, { status: 404 });
     await db.collection("applications").updateOne({ _id: new ObjectId(id) }, { $set: update });
+
+    // Email the candidate on meaningful status changes (interview / hire / reject).
+    if (typeof update.status === "string" && update.status !== app.status && app.email) {
+      notifyApplicantStatus({
+        to: app.email,
+        applicantName: app.fullName ?? "",
+        jobTitle: app.jobTitle ?? "",
+        restaurant: app.restaurant ?? "",
+        status: update.status,
+        interviewAt: typeof update.interviewAt === "string" ? update.interviewAt : undefined,
+        rejectionReason: typeof update.rejectionReason === "string" ? update.rejectionReason : undefined,
+        chatToken: app.chatToken,
+      });
+    }
   } catch (err) {
     console.error("[applications PATCH]", err);
     return NextResponse.json({ ok: false, error: "Update failed." }, { status: 500 });

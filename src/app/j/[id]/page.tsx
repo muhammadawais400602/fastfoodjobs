@@ -25,6 +25,37 @@ export default async function PublicJobPage({ params }: Props) {
   const { job, restaurant } = data;
   const locationLine = restaurant ? [restaurant.profile.address, restaurant.profile.city].filter(Boolean).join(", ") : "";
 
+  // Google for Jobs structured data — lets this listing appear in Google's job search box.
+  const posted = new Date(job.createdAt);
+  const validThrough = new Date(posted.getTime() + 60 * 24 * 60 * 60 * 1000); // 60 days
+  const jobLd = {
+    "@context": "https://schema.org",
+    "@type": "JobPosting",
+    title: job.jobTitle,
+    description:
+      job.description ||
+      `${job.jobTitle}${restaurant ? ` at ${restaurant.restaurant}` : ""}. Apply on FastFoodJobs.`,
+    datePosted: posted.toISOString(),
+    validThrough: validThrough.toISOString(),
+    employmentType: job.jobType?.toUpperCase().replace(/[\s-]/g, "_") || "FULL_TIME",
+    hiringOrganization: {
+      "@type": "Organization",
+      name: restaurant?.restaurant ?? "FastFoodJobs",
+      ...(restaurant?.profile.logoUrl ? { logo: restaurant.profile.logoUrl } : {}),
+    },
+    jobLocation: {
+      "@type": "Place",
+      address: {
+        "@type": "PostalAddress",
+        ...(restaurant?.profile.address ? { streetAddress: restaurant.profile.address } : {}),
+        ...(restaurant?.profile.city ? { addressLocality: restaurant.profile.city } : {}),
+      },
+    },
+    ...(job.rate
+      ? { baseSalary: { "@type": "MonetaryAmount", currency: "USD", value: { "@type": "QuantitativeValue", value: job.rate } } }
+      : {}),
+  };
+
   const stats = [
     { label: "Salary", value: job.rate || "—" },
     { label: "Experience", value: job.experience || "—" },
@@ -34,6 +65,7 @@ export default async function PublicJobPage({ params }: Props) {
 
   return (
     <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jobLd) }} />
       <Navbar />
       <main className="max-w-[1280px] mx-auto px-6 py-10 pt-[88px]">
         <Link href="/jobs" className="text-xs font-bold text-on-surface-variant hover:text-primary flex items-center gap-1 mb-6">

@@ -10,16 +10,36 @@ export default function LoginForm() {
   const nextParam = params.get("next");
 
   const [role, setRole] = useState<Role>("candidate");
-  const [mode, setMode] = useState<"login" | "register">("login");
+  const [mode, setMode] = useState<"login" | "register" | "forgot">("login");
   const [showPass, setShowPass] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setSubmitting(true);
     setError(null);
+    setInfo(null);
     const data = Object.fromEntries(new FormData(e.currentTarget).entries());
+
+    if (mode === "forgot") {
+      try {
+        const res = await fetch("/api/auth/forgot-password", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: data.email, role }),
+        });
+        const json = await res.json();
+        if (!res.ok || !json.ok) throw new Error(json.error ?? "Something went wrong.");
+        setInfo("If an account exists for that email, we've sent a reset link. Check your inbox.");
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Something went wrong.");
+      }
+      setSubmitting(false);
+      return;
+    }
+
     const endpoint = mode === "login" ? "/api/auth/login" : "/api/auth/register";
     try {
       const res = await fetch(endpoint, {
@@ -45,10 +65,14 @@ export default function LoginForm() {
     <div className="bg-surface-container-lowest shadow-[0px_4px_20px_rgba(29,53,87,0.05)] rounded-xl p-8 md:p-10 border border-outline-variant">
       <div className="text-center mb-6">
         <h1 className="text-[36px] md:text-[44px] font-extrabold leading-tight tracking-[-0.02em] text-primary mb-2">
-          {mode === "login" ? "Welcome Back" : "Create Account"}
+          {mode === "login" ? "Welcome Back" : mode === "register" ? "Create Account" : "Reset Password"}
         </h1>
         <p className="text-base text-on-surface-variant">
-          {role === "candidate" ? "Find your next shift and manage your applications." : "Manage your restaurant's hiring."}
+          {mode === "forgot"
+            ? "Enter your email and we'll send you a reset link."
+            : role === "candidate"
+              ? "Find your next shift and manage your applications."
+              : "Manage your restaurant's hiring."}
         </p>
       </div>
 
@@ -97,6 +121,7 @@ export default function LoginForm() {
           </div>
         </div>
 
+        {mode !== "forgot" && (
         <div className="space-y-2">
           <label className="block text-sm font-semibold text-on-surface" htmlFor="password">
             Password
@@ -121,24 +146,39 @@ export default function LoginForm() {
           </div>
           {mode === "register" && <p className="text-xs text-on-surface-variant">At least 8 characters.</p>}
         </div>
+        )}
 
         {mode === "login" && (
-          <div className="flex items-center">
-            <input className="w-4 h-4 rounded accent-primary" id="remember" name="remember" type="checkbox" />
-            <label className="ml-2 text-sm font-semibold text-on-surface-variant cursor-pointer" htmlFor="remember">
-              Remember me for 30 days
-            </label>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center">
+              <input className="w-4 h-4 rounded accent-primary" id="remember" name="remember" type="checkbox" />
+              <label className="ml-2 text-sm font-semibold text-on-surface-variant cursor-pointer" htmlFor="remember">
+                Remember me for 30 days
+              </label>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setMode("forgot");
+                setError(null);
+                setInfo(null);
+              }}
+              className="text-sm font-semibold text-primary hover:underline"
+            >
+              Forgot password?
+            </button>
           </div>
         )}
 
         {error && <p className="text-sm font-semibold text-error bg-error-container rounded-lg px-4 py-3">{error}</p>}
+        {info && <p className="text-sm font-semibold text-green-800 bg-green-50 border border-green-200 rounded-lg px-4 py-3">{info}</p>}
 
         <button
           className="w-full bg-primary hover:bg-primary-container text-white font-semibold text-sm py-4 rounded-lg transition-all active:scale-[0.98] shadow-md disabled:opacity-70"
           type="submit"
           disabled={submitting}
         >
-          {submitting ? "Please wait…" : mode === "login" ? "Sign In" : "Create Account"}
+          {submitting ? "Please wait…" : mode === "login" ? "Sign In" : mode === "register" ? "Create Account" : "Send Reset Link"}
         </button>
       </form>
 
@@ -149,6 +189,7 @@ export default function LoginForm() {
             onClick={() => {
               setMode(mode === "login" ? "register" : "login");
               setError(null);
+              setInfo(null);
             }}
             className="text-primary font-bold hover:underline ml-1"
           >
