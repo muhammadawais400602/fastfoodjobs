@@ -141,31 +141,31 @@ export type RestaurantCardData = {
   logoUrl: string;
 };
 
-// Restaurants that currently have at least one active job, with profile info for cards.
+// Every restaurant account, with a live count of its active (non-expired) jobs.
 export async function getRestaurantsWithActiveJobs(): Promise<RestaurantCardData[]> {
   const db = await getDb();
-  const grouped = await db
-    .collection("postings")
-    .aggregate([
-      { $match: { status: "active", createdAt: { $gte: freshCutoff() } } },
-      { $group: { _id: "$restaurant", jobCount: { $sum: 1 } } },
-      { $sort: { jobCount: -1 } },
-      { $limit: 60 },
-    ])
-    .toArray();
+  const [owners, grouped] = await Promise.all([
+    db.collection("users").find({}).project({ restaurant: 1, profile: 1 }).sort({ createdAt: -1 }).limit(100).toArray(),
+    db
+      .collection("postings")
+      .aggregate([
+        { $match: { status: "active", createdAt: { $gte: freshCutoff() } } },
+        { $group: { _id: "$restaurant", jobCount: { $sum: 1 } } },
+      ])
+      .toArray(),
+  ]);
 
-  const owners = await db.collection("users").find({}).project({ restaurant: 1, profile: 1 }).toArray();
-  const byName = new Map<string, { id: string; profile: Partial<RestaurantProfile> }>();
-  for (const o of owners) byName.set(o.restaurant, { id: o._id.toString(), profile: (o.profile ?? {}) as Partial<RestaurantProfile> });
+  const countByName = new Map<string, number>();
+  for (const g of grouped) countByName.set(g._id as string, g.jobCount as number);
 
-  return grouped
-    .map((g) => {
-      const owner = byName.get(g._id as string);
-      const p = owner?.profile ?? {};
+  return owners
+    .filter((o) => o.restaurant)
+    .map((o) => {
+      const p = (o.profile ?? {}) as Partial<RestaurantProfile>;
       return {
-        id: owner?.id ?? "",
-        name: g._id as string,
-        jobCount: g.jobCount as number,
+        id: o._id.toString(),
+        name: o.restaurant as string,
+        jobCount: countByName.get(o.restaurant as string) ?? 0,
         tagline: p.tagline ?? "",
         description: p.description ?? "",
         city: p.city ?? "",
@@ -173,7 +173,7 @@ export async function getRestaurantsWithActiveJobs(): Promise<RestaurantCardData
         logoUrl: p.logoUrl ?? "",
       };
     })
-    .filter((r) => r.id);
+    .sort((a, b) => b.jobCount - a.jobCount);
 }
 
 export async function getRestaurantActiveJobs(restaurantName: string): Promise<PublicJob[]> {

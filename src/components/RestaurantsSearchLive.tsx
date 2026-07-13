@@ -74,7 +74,7 @@ export default function RestaurantsSearchLive({ restaurants }: { restaurants: Re
 
         <div className="flex-1">
           <p className="text-sm font-semibold text-on-surface-variant mb-4">
-            {results.length} restaurant{results.length === 1 ? "" : "s"} hiring
+            {results.length} restaurant{results.length === 1 ? "" : "s"} found
           </p>
           {results.length === 0 ? (
             <div className="bg-surface-container-lowest rounded-xl p-16 text-center shadow-[0px_4px_20px_rgba(29,53,87,0.05)]">
@@ -109,7 +109,13 @@ export default function RestaurantsSearchLive({ restaurants }: { restaurants: Re
                         {r.cuisine && <span className="text-xs font-bold text-secondary">{r.cuisine}</span>}
                       </div>
                     </div>
-                    <span className="bg-secondary-fixed text-on-secondary-container px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap shrink-0">
+                    <span
+                      className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap shrink-0 ${
+                        r.jobCount > 0
+                          ? "bg-secondary-fixed text-on-secondary-container"
+                          : "bg-surface-container-highest text-on-surface-variant"
+                      }`}
+                    >
                       {r.jobCount} Job{r.jobCount === 1 ? "" : "s"} Available
                     </span>
                   </div>
