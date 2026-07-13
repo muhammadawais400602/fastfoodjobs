@@ -81,8 +81,12 @@ export default function CandidateMessages({ conversations }: { conversations: Co
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="text-sm font-semibold truncate">{c.restaurant || "Restaurant"}</p>
-                  <p className="text-xs text-primary font-semibold truncate">{c.jobTitle}</p>
-                  <span className="inline-block mt-1 text-[10px] font-bold uppercase text-[#586158]">{c.status}</span>
+                  {c.jobTitle && (
+                    <span className="inline-block max-w-full truncate bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full mt-0.5">
+                      {c.jobTitle}
+                    </span>
+                  )}
+                  <span className="block mt-1 text-[10px] font-bold uppercase text-[#586158]">{c.status}</span>
                 </div>
                 {(c.unread ?? 0) > 0 && selected?.token !== c.token && (
                   <span className="shrink-0 min-w-[22px] h-[22px] px-1.5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
@@ -111,7 +115,11 @@ export default function CandidateMessages({ conversations }: { conversations: Co
               </button>
               <div className="min-w-0">
                 <p className="font-bold truncate">{selected.restaurant}</p>
-                <p className="text-xs text-[#586158] truncate">{selected.jobTitle}</p>
+                {selected.jobTitle && (
+                  <span className="inline-block max-w-full truncate bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full">
+                    {selected.jobTitle}
+                  </span>
+                )}
               </div>
             </div>
             <div className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4">

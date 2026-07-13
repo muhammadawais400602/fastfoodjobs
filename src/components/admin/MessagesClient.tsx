@@ -98,8 +98,12 @@ export default function MessagesClient({ candidates }: { candidates: Candidate[]
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold truncate">{c.name}</p>
-                  <p className="text-xs text-[#b7102a] font-semibold truncate">{c.position} applicant</p>
-                  <p className="text-xs text-[#586158] truncate">{c.email}</p>
+                  {c.position && (
+                    <span className="inline-block max-w-full truncate bg-[#b7102a]/10 text-[#b7102a] text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full mt-0.5">
+                      {c.position}
+                    </span>
+                  )}
+                  <p className="text-xs text-[#586158] truncate mt-0.5">{c.email}</p>
                 </div>
                 {c.unread > 0 && selected?.id !== c.id && (
                   <span className="shrink-0 self-center min-w-[22px] h-[22px] px-1.5 bg-[#b7102a] text-white text-xs font-bold rounded-full flex items-center justify-center">
@@ -132,7 +136,11 @@ export default function MessagesClient({ candidates }: { candidates: Candidate[]
                 </div>
                 <div className="min-w-0">
                   <p className="font-bold truncate">{selected.name}</p>
-                  <p className="text-xs text-[#586158] truncate">{selected.position} applicant</p>
+                  {selected.position && (
+                    <span className="inline-block max-w-full truncate bg-[#b7102a]/10 text-[#b7102a] text-[10px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full">
+                      Applying for: {selected.position}
+                    </span>
+                  )}
                 </div>
               </div>
               <button
