@@ -1,5 +1,8 @@
+import { cache } from "react";
 import { cookies } from "next/headers";
 import { SignJWT, jwtVerify } from "jose";
+import { ObjectId } from "mongodb";
+import { getDb } from "@/lib/mongodb";
 
 const COOKIE = "ffj_session";
 
@@ -42,21 +45,42 @@ export async function destroySession() {
   store.delete(COOKIE);
 }
 
-export async function getSession(): Promise<SessionUser | null> {
+// Cached per request so multiple calls (shell + page + APIs) hit the DB once.
+export const getSession = cache(async (): Promise<SessionUser | null> => {
   const store = await cookies();
   const token = store.get(COOKIE)?.value;
   if (!token) return null;
   try {
     const { payload } = await jwtVerify(token, secret());
     const role = (payload.role as Role) === "candidate" ? "candidate" : "restaurant";
-    return {
+    const session: SessionUser = {
       id: String(payload.id),
       email: String(payload.email),
       role,
       restaurant: String(payload.restaurant ?? ""),
       name: String(payload.name ?? payload.restaurant ?? ""),
     };
+
+    // The restaurant name in the token goes stale if the restaurant is renamed
+    // in Settings, which silently breaks the portal (data is scoped by name).
+    // Always use the current name from the database.
+    if (role === "restaurant" && ObjectId.isValid(session.id)) {
+      try {
+        const db = await getDb();
+        const user = await db
+          .collection("users")
+          .findOne({ _id: new ObjectId(session.id) }, { projection: { restaurant: 1 } });
+        if (user?.restaurant) {
+          session.restaurant = String(user.restaurant);
+          session.name = String(user.restaurant);
+        }
+      } catch {
+        // If the lookup fails, fall back to the token's copy rather than logging out.
+      }
+    }
+
+    return session;
   } catch {
     return null;
   }
-}
+});
