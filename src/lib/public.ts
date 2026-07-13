@@ -130,8 +130,19 @@ export async function getJobsByIds(ids: string[]): Promise<JobCard[]> {
   }));
 }
 
-// Restaurants that currently have at least one active job.
-export async function getRestaurantsWithActiveJobs(): Promise<{ id: string; name: string; jobCount: number }[]> {
+export type RestaurantCardData = {
+  id: string;
+  name: string;
+  jobCount: number;
+  tagline: string;
+  description: string;
+  city: string;
+  cuisine: string;
+  logoUrl: string;
+};
+
+// Restaurants that currently have at least one active job, with profile info for cards.
+export async function getRestaurantsWithActiveJobs(): Promise<RestaurantCardData[]> {
   const db = await getDb();
   const grouped = await db
     .collection("postings")
@@ -139,16 +150,29 @@ export async function getRestaurantsWithActiveJobs(): Promise<{ id: string; name
       { $match: { status: "active", createdAt: { $gte: freshCutoff() } } },
       { $group: { _id: "$restaurant", jobCount: { $sum: 1 } } },
       { $sort: { jobCount: -1 } },
-      { $limit: 12 },
+      { $limit: 60 },
     ])
     .toArray();
 
-  const owners = await db.collection("users").find({}).project({ restaurant: 1 }).toArray();
-  const idByName = new Map<string, string>();
-  for (const o of owners) idByName.set(o.restaurant, o._id.toString());
+  const owners = await db.collection("users").find({}).project({ restaurant: 1, profile: 1 }).toArray();
+  const byName = new Map<string, { id: string; profile: Partial<RestaurantProfile> }>();
+  for (const o of owners) byName.set(o.restaurant, { id: o._id.toString(), profile: (o.profile ?? {}) as Partial<RestaurantProfile> });
 
   return grouped
-    .map((g) => ({ id: idByName.get(g._id) ?? "", name: g._id as string, jobCount: g.jobCount as number }))
+    .map((g) => {
+      const owner = byName.get(g._id as string);
+      const p = owner?.profile ?? {};
+      return {
+        id: owner?.id ?? "",
+        name: g._id as string,
+        jobCount: g.jobCount as number,
+        tagline: p.tagline ?? "",
+        description: p.description ?? "",
+        city: p.city ?? "",
+        cuisine: p.cuisine ?? "",
+        logoUrl: p.logoUrl ?? "",
+      };
+    })
     .filter((r) => r.id);
 }
 
