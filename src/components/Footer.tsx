@@ -1,4 +1,4 @@
-const resources = ["Find Jobs", "Post a Job", "Career Advice", "Help Center"];
+const resources = ["Find Jobs", "For Employers", "Career Advice", "Help Center"];
 const company = ["About Us", "Contact Us", "Privacy Policy", "Terms of Service"];
 const socials = ["facebook", "share", "photo_camera", "work"];
 
