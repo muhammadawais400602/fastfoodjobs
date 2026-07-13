@@ -117,6 +117,21 @@ export function notifyApplicantStatus(opts: {
   void sendEmail(opts.to, subject, body);
 }
 
+// --- Email verification ---
+export function sendEmailVerification(opts: { to: string; name: string; verifyUrl: string }) {
+  const first = escapeHtml(opts.name.split(" ")[0] || "there");
+  void sendEmail(
+    opts.to,
+    "Verify your email — FastFoodJobs",
+    `
+    <h2 style="color:#183153;margin:0 0 12px">Welcome to FastFoodJobs, ${first}! 👋</h2>
+    <p style="line-height:1.6;color:#5b403f">Please confirm your email address to unlock everything on your account.</p>
+    ${button(opts.verifyUrl, "Verify my email")}
+    <p style="line-height:1.6;color:#5b403f;font-size:13px">If you didn't create this account, you can ignore this email.</p>
+    `
+  );
+}
+
 // --- Password reset ---
 export function sendPasswordReset(opts: { to: string; resetUrl: string }) {
   void sendEmail(

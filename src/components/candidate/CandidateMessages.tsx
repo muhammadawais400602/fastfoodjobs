@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Message } from "@/lib/messages";
 
-type Convo = { token: string; restaurant: string; jobTitle: string; status: string };
+type Convo = { token: string; restaurant: string; jobTitle: string; status: string; unread?: number };
 
 export default function CandidateMessages({ conversations }: { conversations: Convo[] }) {
   const [selected, setSelected] = useState<Convo | null>(null);
@@ -78,9 +78,18 @@ export default function CandidateMessages({ conversations }: { conversations: Co
                 selected?.token === c.token ? "bg-[#dce5d9]/40 border-l-4 border-l-primary" : "hover:bg-[#f0f3ff]"
               }`}
             >
-              <p className="text-sm font-semibold truncate">{c.restaurant || "Restaurant"}</p>
-              <p className="text-xs text-primary font-semibold truncate">{c.jobTitle}</p>
-              <span className="inline-block mt-1 text-[10px] font-bold uppercase text-[#586158]">{c.status}</span>
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold truncate">{c.restaurant || "Restaurant"}</p>
+                  <p className="text-xs text-primary font-semibold truncate">{c.jobTitle}</p>
+                  <span className="inline-block mt-1 text-[10px] font-bold uppercase text-[#586158]">{c.status}</span>
+                </div>
+                {(c.unread ?? 0) > 0 && selected?.token !== c.token && (
+                  <span className="shrink-0 min-w-[22px] h-[22px] px-1.5 bg-primary text-white text-xs font-bold rounded-full flex items-center justify-center">
+                    {(c.unread ?? 0) > 9 ? "9+" : c.unread}
+                  </span>
+                )}
+              </div>
             </button>
           ))}
         </div>

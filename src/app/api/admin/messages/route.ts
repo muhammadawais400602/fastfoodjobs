@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { ObjectId } from "mongodb";
 import { getDb } from "@/lib/mongodb";
 import { getSession } from "@/lib/auth";
-import { getThread, postMessage } from "@/lib/messages";
+import { getThread, postMessage, markThreadRead } from "@/lib/messages";
 
 // Verify the application belongs to this restaurant.
 async function ownsApplication(applicationId: string, restaurant: string) {
@@ -21,6 +21,8 @@ export async function GET(request: Request) {
   if (!(await ownsApplication(applicationId, session.restaurant))) {
     return NextResponse.json({ ok: false, error: "Not found." }, { status: 404 });
   }
+  const db = await getDb();
+  await markThreadRead(db, applicationId, "restaurant");
   return NextResponse.json({ ok: true, messages: await getThread(applicationId) });
 }
 

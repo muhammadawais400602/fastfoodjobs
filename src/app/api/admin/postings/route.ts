@@ -22,6 +22,14 @@ export async function POST(request: Request) {
 
   try {
     const db = await getDb();
+    // Accounts created before verification existed (no flag) are grandfathered in.
+    const owner = await db.collection("users").findOne({ email: session.email });
+    if (owner && owner.emailVerified === false) {
+      return NextResponse.json(
+        { ok: false, error: "Please verify your email before posting jobs — check your inbox for the verification link." },
+        { status: 403 }
+      );
+    }
     await db.collection("postings").insertOne({
       restaurant: session.restaurant,
       jobTitle: String(jobTitle).trim(),

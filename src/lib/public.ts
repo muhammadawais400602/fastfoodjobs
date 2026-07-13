@@ -78,12 +78,19 @@ export type JobCard = {
   restaurantId: string;
 };
 
+
+// Public listings expire 30 days after posting so the site never shows stale jobs.
+const LISTING_TTL_DAYS = 30;
+function freshCutoff(): Date {
+  return new Date(Date.now() - LISTING_TTL_DAYS * 24 * 60 * 60 * 1000);
+}
+
 // All active jobs across every restaurant, with the owning restaurant's id resolved.
 export async function getAllActiveJobs(): Promise<JobCard[]> {
   const db = await getDb();
   const postings = await db
     .collection("postings")
-    .find({ status: "active" })
+    .find({ status: "active", createdAt: { $gte: freshCutoff() } })
     .sort({ createdAt: -1 })
     .limit(200)
     .toArray();
@@ -108,7 +115,7 @@ export async function getJobsByIds(ids: string[]): Promise<JobCard[]> {
   const objIds = ids.filter((id) => ObjectId.isValid(id)).map((id) => new ObjectId(id));
   if (objIds.length === 0) return [];
   const db = await getDb();
-  const postings = await db.collection("postings").find({ _id: { $in: objIds }, status: "active" }).toArray();
+  const postings = await db.collection("postings").find({ _id: { $in: objIds }, status: "active", createdAt: { $gte: freshCutoff() } }).toArray();
   const owners = await db.collection("users").find({}).project({ restaurant: 1 }).toArray();
   const idByName = new Map<string, string>();
   for (const o of owners) idByName.set(o.restaurant, o._id.toString());
@@ -129,7 +136,7 @@ export async function getRestaurantsWithActiveJobs(): Promise<{ id: string; name
   const grouped = await db
     .collection("postings")
     .aggregate([
-      { $match: { status: "active" } },
+      { $match: { status: "active", createdAt: { $gte: freshCutoff() } } },
       { $group: { _id: "$restaurant", jobCount: { $sum: 1 } } },
       { $sort: { jobCount: -1 } },
       { $limit: 12 },
@@ -149,7 +156,7 @@ export async function getRestaurantActiveJobs(restaurantName: string): Promise<P
   const db = await getDb();
   const docs = await db
     .collection("postings")
-    .find({ restaurant: restaurantName, status: "active" })
+    .find({ restaurant: restaurantName, status: "active", createdAt: { $gte: freshCutoff() } })
     .sort({ createdAt: -1 })
     .toArray();
   return docs.map((d) => mapJob(d as Record<string, unknown>));

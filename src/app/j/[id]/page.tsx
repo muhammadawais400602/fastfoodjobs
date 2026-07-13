@@ -27,7 +27,7 @@ export default async function PublicJobPage({ params }: Props) {
 
   // Google for Jobs structured data — lets this listing appear in Google's job search box.
   const posted = new Date(job.createdAt);
-  const validThrough = new Date(posted.getTime() + 60 * 24 * 60 * 60 * 1000); // 60 days
+  const validThrough = new Date(posted.getTime() + 30 * 24 * 60 * 60 * 1000); // matches the 30-day listing expiry
   const jobLd = {
     "@context": "https://schema.org",
     "@type": "JobPosting",

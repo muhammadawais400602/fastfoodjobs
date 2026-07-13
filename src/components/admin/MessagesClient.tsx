@@ -96,11 +96,16 @@ export default function MessagesClient({ candidates }: { candidates: Candidate[]
                 <div className="w-11 h-11 rounded-full bg-[#b7102a]/10 text-[#b7102a] font-bold flex items-center justify-center shrink-0">
                   {initials(c.name)}
                 </div>
-                <div className="min-w-0">
+                <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold truncate">{c.name}</p>
                   <p className="text-xs text-[#b7102a] font-semibold truncate">{c.position} applicant</p>
                   <p className="text-xs text-[#586158] truncate">{c.email}</p>
                 </div>
+                {c.unread > 0 && selected?.id !== c.id && (
+                  <span className="shrink-0 self-center min-w-[22px] h-[22px] px-1.5 bg-[#b7102a] text-white text-xs font-bold rounded-full flex items-center justify-center">
+                    {c.unread > 9 ? "9+" : c.unread}
+                  </span>
+                )}
               </button>
             ))
           )}

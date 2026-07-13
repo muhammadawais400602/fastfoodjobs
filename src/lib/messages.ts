@@ -40,8 +40,37 @@ export async function postMessage(
     restaurant,
     sender,
     body,
+    read: false,
     createdAt: new Date(),
   });
+}
+
+// Mark all messages from the other party as read (called when a thread is opened).
+export async function markThreadRead(db: Db, applicationId: string, reader: "restaurant" | "applicant") {
+  const otherSender = reader === "restaurant" ? "applicant" : "restaurant";
+  await db
+    .collection("messages")
+    .updateMany({ applicationId, sender: otherSender, read: { $ne: true } }, { $set: { read: true } });
+}
+
+// Unread incoming-message counts per application id.
+export async function unreadCounts(
+  applicationIds: string[],
+  reader: "restaurant" | "applicant"
+): Promise<Map<string, number>> {
+  const map = new Map<string, number>();
+  if (applicationIds.length === 0) return map;
+  const otherSender = reader === "restaurant" ? "applicant" : "restaurant";
+  const db = await getDb();
+  const grouped = await db
+    .collection("messages")
+    .aggregate([
+      { $match: { applicationId: { $in: applicationIds }, sender: otherSender, read: { $ne: true } } },
+      { $group: { _id: "$applicationId", count: { $sum: 1 } } },
+    ])
+    .toArray();
+  for (const g of grouped) map.set(g._id as string, g.count as number);
+  return map;
 }
 
 export type Candidate = {
@@ -51,6 +80,7 @@ export type Candidate = {
   email: string;
   status: string;
   chatToken: string;
+  unread: number;
 };
 
 // Candidates (applications) for a restaurant, each with a chat token ensured.
@@ -62,6 +92,8 @@ export async function getCandidates(restaurant: string): Promise<Candidate[]> {
     .sort({ createdAt: -1 })
     .limit(200)
     .toArray();
+
+  const unread = await unreadCounts(docs.map((d) => d._id.toString()), "restaurant");
 
   const out: Candidate[] = [];
   for (const d of docs) {
@@ -77,6 +109,7 @@ export async function getCandidates(restaurant: string): Promise<Candidate[]> {
       email: d.email ?? "",
       status: d.status ?? "new",
       chatToken: token,
+      unread: unread.get(d._id.toString()) ?? 0,
     });
   }
   return out;

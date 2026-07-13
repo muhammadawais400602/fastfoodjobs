@@ -1,5 +1,7 @@
 import { getSession } from "@/lib/auth";
+import { getDb } from "@/lib/mongodb";
 import PortalSidebar from "@/components/PortalSidebar";
+import VerifyEmailBanner from "@/components/VerifyEmailBanner";
 
 const nav = [
   { label: "Dashboard", icon: "dashboard", href: "/admin" },
@@ -25,6 +27,17 @@ export default async function AdminShell({
 }) {
   const session = await getSession();
 
+  let unverified = false;
+  if (session) {
+    try {
+      const db = await getDb();
+      const user = await db.collection("users").findOne({ email: session.email });
+      unverified = user?.emailVerified === false;
+    } catch {
+      // If the check fails, don't block the page over a banner.
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#f9f9ff] text-[#001b3c]">
       <PortalSidebar
@@ -40,6 +53,7 @@ export default async function AdminShell({
 
       <div className="lg:ml-[260px]">
         <main className="p-4 md:p-6 lg:p-8 max-w-[1440px] mx-auto animate-fade-in-up">
+          {unverified && <VerifyEmailBanner />}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 md:mb-8">
             <div>
               <h2 className="text-2xl md:text-[32px] font-bold leading-tight">{title}</h2>

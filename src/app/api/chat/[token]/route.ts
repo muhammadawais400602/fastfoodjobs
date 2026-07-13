@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getDb } from "@/lib/mongodb";
-import { getThread, postMessage } from "@/lib/messages";
+import { getThread, postMessage, markThreadRead } from "@/lib/messages";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
 
 // Public applicant chat, accessed via a per-application magic-link token.
@@ -14,6 +14,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tok
   const { token } = await params;
   const app = await findByToken(token);
   if (!app) return NextResponse.json({ ok: false }, { status: 404 });
+  const db = await getDb();
+  await markThreadRead(db, app._id.toString(), "applicant");
   return NextResponse.json({
     ok: true,
     restaurant: app.restaurant ?? "",

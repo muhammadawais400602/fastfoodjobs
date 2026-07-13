@@ -3,6 +3,24 @@ import bcrypt from "bcryptjs";
 import { getDb } from "@/lib/mongodb";
 import { createSession } from "@/lib/auth";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
+import crypto from "crypto";
+import type { Db } from "mongodb";
+import { sendEmailVerification } from "@/lib/email";
+
+const APP_URL = process.env.APP_URL || process.env.NEXT_PUBLIC_APP_URL || "https://fastfoodjobs.vercel.app";
+
+async function startEmailVerification(db: Db, email: string, name: string, role: string) {
+  const token = crypto.randomBytes(32).toString("hex");
+  const tokenHash = crypto.createHash("sha256").update(token).digest("hex");
+  await db.collection("email_verifications").insertOne({
+    tokenHash,
+    email,
+    role,
+    expiresAt: new Date(Date.now() + 24 * 60 * 60 * 1000),
+    createdAt: new Date(),
+  });
+  sendEmailVerification({ to: email, name, verifyUrl: `${APP_URL}/api/auth/verify?token=${token}` });
+}
 
 export async function POST(request: Request) {
   if (!rateLimit(`register:${clientIp(request)}`, 5, 60_000)) {
@@ -42,13 +60,21 @@ export async function POST(request: Request) {
         name,
         savedJobs: [],
         careerStatus: "looking",
+        emailVerified: false,
         createdAt: new Date(),
       });
       await createSession({ id: result.insertedId.toString(), email, role: "candidate", restaurant: "", name }, false);
     } else {
-      const result = await db.collection("users").insertOne({ email, passwordHash, restaurant: name, createdAt: new Date() });
+      const result = await db.collection("users").insertOne({
+        email,
+        passwordHash,
+        restaurant: name,
+        emailVerified: false,
+        createdAt: new Date(),
+      });
       await createSession({ id: result.insertedId.toString(), email, role: "restaurant", restaurant: name, name }, false);
     }
+    await startEmailVerification(db, email, name, role);
   } catch (err) {
     console.error("[register]", err);
     return NextResponse.json({ ok: false, error: "Couldn't create the account. Please try again." }, { status: 500 });
