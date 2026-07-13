@@ -31,7 +31,9 @@ export async function POST(request: Request) {
       );
     }
     await db.collection("postings").insertOne({
-      restaurant: session.restaurant,
+      // Use the restaurant's current name from the DB — the session copy can be
+      // stale if the restaurant was renamed in Settings after logging in.
+      restaurant: (owner?.restaurant as string) || session.restaurant,
       jobTitle: String(jobTitle).trim(),
       department: String(department ?? "").trim(),
       jobType: String(jobType).trim(),
