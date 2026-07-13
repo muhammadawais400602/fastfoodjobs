@@ -45,18 +45,18 @@ export default function CreateListing() {
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 animate-fade-in">
           <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
           <form
             onSubmit={(e) => submit(e, "active")}
-            className="relative bg-white rounded-xl w-full max-w-lg p-8 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto"
+            className="relative bg-white rounded-xl w-full max-w-lg p-6 md:p-8 shadow-2xl space-y-4 max-h-[90dvh] overflow-y-auto animate-scale-in"
           >
             <h3 className="text-2xl font-bold">Create Job Listing</h3>
             <div>
               <label className="text-sm font-semibold text-[#586158]">Job Title</label>
               <input className={inputClass} name="jobTitle" placeholder="Shift Manager" required />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-semibold text-[#586158]">Department</label>
                 <input className={inputClass} name="department" placeholder="Front of House" />
@@ -70,7 +70,7 @@ export default function CreateListing() {
                 </select>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="text-sm font-semibold text-[#586158]">Hourly Rate</label>
                 <input className={inputClass} name="rate" placeholder="$18 - $24 / hr" />

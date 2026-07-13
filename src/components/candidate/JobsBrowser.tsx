@@ -44,9 +44,9 @@ export default function JobsBrowser({ jobs, savedIds }: { jobs: JobCard[]; saved
           <p className="text-[#586158]">No jobs found. Check back soon.</p>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-4 stagger-children">
           {results.map((j) => (
-            <div key={j.id} className="bg-white p-6 rounded-xl border border-[#e4bebc] shadow-[0px_4px_20px_rgba(29,53,87,0.05)] hover:border-primary transition-all">
+            <div key={j.id} className="bg-white p-6 rounded-xl border border-[#e4bebc] shadow-[0px_4px_20px_rgba(29,53,87,0.05)] hover:border-primary card-lift">
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
                   <h4 className="text-xl font-bold">{j.jobTitle}</h4>

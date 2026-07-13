@@ -107,15 +107,15 @@ export default function ListingsTable({ postings }: { postings: PostingDoc[] }) 
       </div>
 
       {editing && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 animate-fade-in">
           <div className="absolute inset-0 bg-black/40" onClick={() => setEditing(null)} />
-          <form onSubmit={saveEdit} className="relative bg-white rounded-xl w-full max-w-lg p-8 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+          <form onSubmit={saveEdit} className="relative bg-white rounded-xl w-full max-w-lg p-6 md:p-8 shadow-2xl space-y-4 max-h-[90dvh] overflow-y-auto animate-scale-in">
             <h3 className="text-2xl font-bold">Edit Listing</h3>
             <div>
               <label className="text-sm font-semibold text-[#586158]">Job Title</label>
               <input className={inputClass} name="jobTitle" defaultValue={editing.jobTitle} required />
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-semibold text-[#586158]">Job Type</label>
                 <select className={inputClass} name="jobType" defaultValue={editing.jobType}>
@@ -133,7 +133,7 @@ export default function ListingsTable({ postings }: { postings: PostingDoc[] }) 
                 </select>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
                 <label className="text-sm font-semibold text-[#586158]">Hourly Rate</label>
                 <input className={inputClass} name="rate" defaultValue={editing.rate} placeholder="$18 - $24 / hr" />

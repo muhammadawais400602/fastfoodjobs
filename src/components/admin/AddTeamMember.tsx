@@ -44,11 +44,11 @@ export default function AddTeamMember() {
       </button>
 
       {open && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 animate-fade-in">
           <div className="absolute inset-0 bg-black/40" onClick={() => setOpen(false)} />
-          <form onSubmit={submit} className="relative bg-white rounded-xl w-full max-w-lg p-8 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
+          <form onSubmit={submit} className="relative bg-white rounded-xl w-full max-w-lg p-6 md:p-8 shadow-2xl space-y-4 max-h-[90dvh] overflow-y-auto animate-scale-in">
             <h3 className="text-2xl font-bold">Add Team Member</h3>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-semibold text-[#586158]">Name</label>
                 <input className={inputClass} name="name" placeholder="Elena Rodriguez" required />
@@ -58,7 +58,7 @@ export default function AddTeamMember() {
                 <input className={inputClass} name="role" placeholder="Head Chef" required />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-semibold text-[#586158]">Email</label>
                 <input className={inputClass} name="email" type="email" placeholder="elena@bistro.com" />
@@ -68,7 +68,7 @@ export default function AddTeamMember() {
                 <input className={inputClass} name="phone" placeholder="+1 (555) 012-3456" />
               </div>
             </div>
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="text-sm font-semibold text-[#586158]">Shift</label>
                 <input className={inputClass} name="shift" placeholder="Evening (14:00 - 22:00)" />

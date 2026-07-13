@@ -165,9 +165,9 @@ export default function ApplicantActions({
 
       {/* Interview modal */}
       {modal === "interview" && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 animate-fade-in">
           <div className="absolute inset-0 bg-black/40" onClick={() => setModal(null)} />
-          <div className="relative bg-white rounded-xl w-full max-w-md p-8 shadow-2xl space-y-4">
+          <div className="relative bg-white rounded-xl w-full max-w-md p-6 md:p-8 shadow-2xl space-y-4 animate-scale-in max-h-[90dvh] overflow-y-auto">
             <h3 className="text-2xl font-bold">Move to Interview</h3>
             <p className="text-sm text-[#586158]">Schedule {applicantName} for an interview, or chat by email.</p>
             <div>
@@ -212,9 +212,9 @@ export default function ApplicantActions({
 
       {/* Reject modal */}
       {modal === "reject" && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 animate-fade-in">
           <div className="absolute inset-0 bg-black/40" onClick={() => setModal(null)} />
-          <div className="relative bg-white rounded-xl w-full max-w-md p-8 shadow-2xl space-y-4">
+          <div className="relative bg-white rounded-xl w-full max-w-md p-6 md:p-8 shadow-2xl space-y-4 animate-scale-in max-h-[90dvh] overflow-y-auto">
             <h3 className="text-2xl font-bold">Reject Applicant</h3>
             <p className="text-sm text-[#586158]">Add a reason — this is kept for your records.</p>
             <textarea

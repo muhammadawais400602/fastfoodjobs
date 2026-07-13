@@ -22,7 +22,7 @@ export default async function CandidateDashboard() {
 
   return (
     <CandidateShell active="Dashboard" title="My Career Path" subtitle="Track your progress and manage your journey.">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 mb-10 stagger-children">
         {cards.map((c) => (
           <div key={c.label} className="bg-white p-6 rounded-xl border border-[#e4bebc] shadow-[0px_4px_20px_rgba(29,53,87,0.05)]">
             <div className="flex justify-between items-start mb-2">

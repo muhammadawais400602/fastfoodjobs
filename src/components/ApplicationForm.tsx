@@ -199,9 +199,9 @@ export default function ApplicationForm({
 
       {/* Success modal */}
       {sent && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-6 animate-fade-in">
           <div className="absolute inset-0 bg-on-surface/40 backdrop-blur-md"></div>
-          <div className="bg-surface relative rounded-2xl p-12 max-w-md w-full shadow-2xl text-center flex flex-col items-center gap-6">
+          <div className="bg-surface relative rounded-2xl p-8 md:p-12 max-w-md w-full shadow-2xl text-center flex flex-col items-center gap-6 animate-scale-in">
             <div className="w-20 h-20 bg-primary-fixed text-primary rounded-full flex items-center justify-center">
               <span className="material-symbols-outlined text-[48px]">check_circle</span>
             </div>
