@@ -7,6 +7,7 @@ import ApplicationForm from "@/components/ApplicationForm";
 import { getPublicJob } from "@/lib/public";
 import { getSession } from "@/lib/auth";
 import { getCandidate } from "@/lib/candidate";
+import { getDb } from "@/lib/mongodb";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,20 @@ export default async function ApplyJobPage({ params }: Props) {
 
   const session = await getSession();
   const candidate = session?.role === "candidate" ? await getCandidate(session.id) : null;
+
+  // A candidate can only apply once per job — if they already did, show their chat instead of the form.
+  let existingChatUrl: string | null = null;
+  if (candidate?.email) {
+    try {
+      const db = await getDb();
+      const existing = await db
+        .collection("applications")
+        .findOne({ jobId: job.id, email: candidate.email.toLowerCase() });
+      if (existing) existingChatUrl = existing.chatToken ? `/chat/${existing.chatToken}` : "/candidate/applications";
+    } catch {
+      // If the check fails, the API's duplicate guard still catches it on submit.
+    }
+  }
 
   return (
     <>
@@ -53,15 +68,44 @@ export default async function ApplyJobPage({ params }: Props) {
             </p>
           </div>
 
-          <ApplicationForm
-            jobSlug=""
-            jobId={job.id}
-            jobTitle={job.jobTitle}
-            restaurant={restaurant?.restaurant ?? ""}
-            defaultName={candidate?.name}
-            defaultEmail={candidate?.email}
-            defaultPhone={candidate?.phone}
-          />
+          {existingChatUrl ? (
+            <section className="bg-surface-container-lowest rounded-xl shadow-[0px_8px_30px_rgba(29,53,87,0.08)] border border-outline-variant/10 p-8 md:p-14 text-center animate-fade-in-up">
+              <div className="w-16 h-16 mx-auto mb-4 bg-primary-fixed text-primary rounded-full flex items-center justify-center">
+                <span className="material-symbols-outlined text-[36px]">how_to_reg</span>
+              </div>
+              <h2 className="text-2xl font-bold mb-2">You&apos;ve already applied</h2>
+              <p className="text-on-surface-variant mb-8 max-w-md mx-auto">
+                Your application for <span className="font-bold text-secondary">{job.jobTitle}</span>
+                {restaurant ? ` at ${restaurant.restaurant}` : ""} is in. Each person can apply once per job — but you
+                can message the restaurant any time.
+              </p>
+              <div className="flex flex-col sm:flex-row justify-center gap-3">
+                <Link
+                  href={existingChatUrl}
+                  className="bg-primary text-on-primary px-8 py-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+                >
+                  <span className="material-symbols-outlined text-[18px]">chat</span>
+                  Open your chat
+                </Link>
+                <Link
+                  href="/candidate/applications"
+                  className="border border-outline text-on-surface px-8 py-3 rounded-lg text-sm font-semibold flex items-center justify-center"
+                >
+                  View my applications
+                </Link>
+              </div>
+            </section>
+          ) : (
+            <ApplicationForm
+              jobSlug=""
+              jobId={job.id}
+              jobTitle={job.jobTitle}
+              restaurant={restaurant?.restaurant ?? ""}
+              defaultName={candidate?.name}
+              defaultEmail={candidate?.email}
+              defaultPhone={candidate?.phone}
+            />
+          )}
         </div>
       </main>
       <Footer />
