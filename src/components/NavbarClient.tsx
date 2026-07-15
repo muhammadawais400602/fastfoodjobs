@@ -3,11 +3,16 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
-type SessionInfo = { role: "restaurant" | "candidate"; name: string } | null;
+type SessionInfo = { role: "restaurant" | "candidate"; name: string; logoUrl?: string } | null;
 
-const publicLinks = [
-  { label: "Find Jobs", href: "/jobs" },
-  { label: "Login", href: "/login" },
+// Main site menu, centered in the header for everyone.
+const menuLinks = [
+  { label: "Home", href: "/" },
+  { label: "Restaurants", href: "/jobs" },
+  { label: "Subscription", href: "/subscription" },
+  { label: "FAQ", href: "/faq" },
+  { label: "Blog", href: "/blog" },
+  { label: "Contact", href: "/contact" },
 ];
 
 const restaurantLinks = [
@@ -35,13 +40,30 @@ function initials(name: string) {
   );
 }
 
+function Avatar({ session, size }: { session: NonNullable<SessionInfo>; size: string }) {
+  if (session.logoUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={session.logoUrl}
+        alt={session.name}
+        className={`${size} rounded-full object-cover border border-outline-variant/40`}
+      />
+    );
+  }
+  return (
+    <div className={`${size} rounded-full bg-primary/10 text-primary font-bold text-sm flex items-center justify-center`}>
+      {initials(session.name)}
+    </div>
+  );
+}
+
 export default function NavbarClient({ session }: { session: SessionInfo }) {
   const [open, setOpen] = useState(false); // mobile menu
   const [menuOpen, setMenuOpen] = useState(false); // profile dropdown
   const menuRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
 
-  // Close the profile dropdown when clicking anywhere else.
   useEffect(() => {
     if (!menuOpen) return;
     const onClick = (e: MouseEvent) => {
@@ -62,27 +84,37 @@ export default function NavbarClient({ session }: { session: SessionInfo }) {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-surface shadow-[0px_4px_20px_rgba(29,53,87,0.05)]">
-      <nav className="flex justify-between items-center w-full px-6 max-w-[1280px] mx-auto h-14">
+      <nav className="relative flex justify-between items-center w-full px-6 max-w-[1280px] mx-auto h-14">
         <Link
           href={session ? (session.role === "restaurant" ? "/admin" : "/candidate") : "/"}
-          className="text-2xl font-extrabold text-primary tracking-tight"
+          className="text-2xl font-extrabold text-primary tracking-tight shrink-0"
         >
-          FastFoodJobs{session && <span className="font-bold text-on-surface"> Portal</span>}
+          FastFoodJobs
         </Link>
 
-        {/* Desktop nav */}
-        <div className="hidden md:flex items-center gap-6">
+        {/* Centered main menu (desktop) */}
+        <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-7">
+          {menuLinks.map((link) => (
+            <Link
+              key={link.label}
+              href={link.href}
+              className="text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors"
+            >
+              {link.label}
+            </Link>
+          ))}
+        </div>
+
+        {/* Right side (desktop) */}
+        <div className="hidden lg:flex items-center gap-4 shrink-0">
           {!session ? (
             <>
-              {publicLinks.map((link) => (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  className="text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors"
-                >
-                  {link.label}
-                </Link>
-              ))}
+              <Link
+                href="/login"
+                className="text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors"
+              >
+                Login
+              </Link>
               <Link
                 href="/jobs"
                 className="bg-primary text-on-primary px-6 py-2 rounded-full text-sm font-semibold hover:opacity-90 active:scale-95 transition-all"
@@ -92,14 +124,7 @@ export default function NavbarClient({ session }: { session: SessionInfo }) {
             </>
           ) : (
             <>
-              <Link
-                href="/jobs"
-                className="text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors"
-              >
-                Find Jobs
-              </Link>
               <span className="material-symbols-outlined text-on-surface-variant">notifications</span>
-
               {/* Profile dropdown */}
               <div className="relative" ref={menuRef}>
                 <button
@@ -108,9 +133,7 @@ export default function NavbarClient({ session }: { session: SessionInfo }) {
                   aria-expanded={menuOpen}
                   aria-haspopup="menu"
                 >
-                  <div className="w-9 h-9 rounded-full bg-primary/10 text-primary font-bold text-sm flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-                    {initials(session.name)}
-                  </div>
+                  <Avatar session={session} size="w-9 h-9" />
                   <span
                     className={`material-symbols-outlined text-[20px] text-on-surface-variant transition-transform duration-200 ${
                       menuOpen ? "rotate-180" : ""
@@ -122,9 +145,12 @@ export default function NavbarClient({ session }: { session: SessionInfo }) {
 
                 {menuOpen && (
                   <div className="absolute right-0 top-[calc(100%+8px)] w-64 bg-white rounded-xl shadow-[0px_12px_40px_rgba(29,53,87,0.18)] border border-outline-variant/30 py-2 animate-scale-in origin-top-right">
-                    <div className="px-4 py-3 border-b border-outline-variant/30">
-                      <p className="text-sm font-bold text-on-surface truncate">{session.name}</p>
-                      <p className="text-xs text-on-surface-variant capitalize">{session.role} account</p>
+                    <div className="px-4 py-3 border-b border-outline-variant/30 flex items-center gap-3">
+                      <Avatar session={session} size="w-10 h-10" />
+                      <div className="min-w-0">
+                        <p className="text-sm font-bold text-on-surface truncate">{session.name}</p>
+                        <p className="text-xs text-on-surface-variant capitalize">{session.role} account</p>
+                      </div>
                     </div>
                     {portalLinks.map((link) => (
                       <Link
@@ -163,7 +189,7 @@ export default function NavbarClient({ session }: { session: SessionInfo }) {
 
         {/* Mobile hamburger */}
         <button
-          className="md:hidden text-primary p-1"
+          className="lg:hidden text-primary p-1"
           onClick={() => setOpen(!open)}
           aria-label="Toggle menu"
           aria-expanded={open}
@@ -174,38 +200,58 @@ export default function NavbarClient({ session }: { session: SessionInfo }) {
 
       {/* Mobile menu */}
       {open && (
-        <div className="md:hidden bg-surface border-t border-outline-variant/20 shadow-lg px-6 py-5 flex flex-col gap-5 animate-fade-in">
+        <div className="lg:hidden bg-surface border-t border-outline-variant/20 shadow-lg px-6 py-5 flex flex-col gap-5 animate-fade-in max-h-[calc(100dvh-3.5rem)] overflow-y-auto">
           {session && (
             <div className="flex items-center gap-3 pb-4 border-b border-outline-variant/30">
-              <div className="w-10 h-10 rounded-full bg-primary/10 text-primary font-bold flex items-center justify-center">
-                {initials(session.name)}
-              </div>
+              <Avatar session={session} size="w-10 h-10" />
               <div className="min-w-0">
                 <p className="text-sm font-bold truncate">{session.name}</p>
                 <p className="text-xs text-on-surface-variant capitalize">{session.role} account</p>
               </div>
             </div>
           )}
-          {(!session ? publicLinks : [...portalLinks, { label: "Settings", href: settingsHref, icon: "settings" }]).map(
-            (link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="text-sm font-semibold text-on-surface-variant"
-                onClick={() => setOpen(false)}
-              >
-                {link.label}
-              </Link>
-            )
+          {menuLinks.map((link) => (
+            <Link
+              key={link.label}
+              href={link.href}
+              className="text-sm font-semibold text-on-surface-variant"
+              onClick={() => setOpen(false)}
+            >
+              {link.label}
+            </Link>
+          ))}
+          {session && (
+            <div className="pt-4 border-t border-outline-variant/30 flex flex-col gap-5">
+              {[...portalLinks, { label: "Settings", href: settingsHref, icon: "settings" }].map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className="flex items-center gap-2 text-sm font-semibold text-on-surface-variant"
+                  onClick={() => setOpen(false)}
+                >
+                  <span className="material-symbols-outlined text-[20px]">{link.icon}</span>
+                  {link.label}
+                </Link>
+              ))}
+            </div>
           )}
           {!session ? (
-            <Link
-              href="/jobs"
-              onClick={() => setOpen(false)}
-              className="bg-primary text-on-primary px-6 py-3 rounded-full text-sm font-semibold text-center"
-            >
-              Apply Now
-            </Link>
+            <div className="flex flex-col gap-3 pt-2">
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className="border border-outline text-on-surface px-6 py-3 rounded-full text-sm font-semibold text-center"
+              >
+                Login
+              </Link>
+              <Link
+                href="/jobs"
+                onClick={() => setOpen(false)}
+                className="bg-primary text-on-primary px-6 py-3 rounded-full text-sm font-semibold text-center"
+              >
+                Apply Now
+              </Link>
+            </div>
           ) : (
             <button
               onClick={signOut}
