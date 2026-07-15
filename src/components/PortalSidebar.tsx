@@ -105,7 +105,9 @@ export default function PortalSidebar({
         </div>
         <div className="flex items-center gap-3 md:gap-4">
           <span className="material-symbols-outlined text-[#586158] hidden sm:block">notifications</span>
-          <span className="material-symbols-outlined text-[#586158] hidden sm:block">help</span>
+          <Link href="/faq" className="hidden sm:block" title="Help & FAQs">
+            <span className="material-symbols-outlined text-[#586158] hover:text-[#b7102a] transition-colors">help</span>
+          </Link>
           <div className="h-8 w-px bg-[#e4bebc] hidden sm:block" />
           <span className="text-sm font-semibold text-[#b7102a] truncate max-w-[140px] md:max-w-none">{headerRight}</span>
         </div>

@@ -1,4 +1,9 @@
-const resources = ["Find Jobs", "For Employers", "Career Advice", "Help Center"];
+const resources = [
+  { label: "Find Jobs", href: "/jobs" },
+  { label: "For Employers", href: "/login" },
+  { label: "FAQs", href: "/faq" },
+  { label: "Help Center", href: "/faq" },
+];
 const company = ["About Us", "Contact Us", "Privacy Policy", "Terms of Service"];
 const socials = ["facebook", "share", "photo_camera", "work"];
 
@@ -18,9 +23,9 @@ export default function Footer() {
             <h4 className="text-sm font-semibold text-on-surface uppercase tracking-wider">Resources</h4>
             <ul className="space-y-3">
               {resources.map((link) => (
-                <li key={link}>
-                  <a href="#" className="text-base text-on-surface-variant hover:text-primary transition-colors">
-                    {link}
+                <li key={link.label}>
+                  <a href={link.href} className="text-base text-on-surface-variant hover:text-primary transition-colors">
+                    {link.label}
                   </a>
                 </li>
               ))}
