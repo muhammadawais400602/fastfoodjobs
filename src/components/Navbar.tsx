@@ -9,15 +9,22 @@ export default async function Navbar() {
   const session = await getSession();
 
   let logoUrl = "";
-  if (session?.role === "restaurant" && ObjectId.isValid(session.id)) {
+  if (session && ObjectId.isValid(session.id)) {
     try {
       const db = await getDb();
-      const user = await db
-        .collection("users")
-        .findOne({ _id: new ObjectId(session.id) }, { projection: { "profile.logoUrl": 1 } });
-      logoUrl = String(user?.profile?.logoUrl ?? "");
+      if (session.role === "restaurant") {
+        const user = await db
+          .collection("users")
+          .findOne({ _id: new ObjectId(session.id) }, { projection: { "profile.logoUrl": 1 } });
+        logoUrl = String(user?.profile?.logoUrl ?? "");
+      } else {
+        const c = await db
+          .collection("candidates")
+          .findOne({ _id: new ObjectId(session.id) }, { projection: { avatarUrl: 1 } });
+        logoUrl = String(c?.avatarUrl ?? "");
+      }
     } catch {
-      // No logo is fine — the client falls back to initials.
+      // No image is fine — the client falls back to initials.
     }
   }
 

@@ -7,6 +7,7 @@ export type CandidateProfile = {
   name: string;
   phone: string;
   language: string;
+  avatarUrl: string;
   careerStatus: "looking" | "not_looking";
   resumeUrl: string;
   resumeName: string;
@@ -27,6 +28,7 @@ export async function getCandidate(id: string): Promise<CandidateProfile | null>
     name: c.name ?? "",
     phone: c.phone ?? "",
     language: c.language ?? "English (US)",
+    avatarUrl: c.avatarUrl ?? "",
     careerStatus: c.careerStatus === "not_looking" ? "not_looking" : "looking",
     resumeUrl: c.resumeUrl ?? "",
     resumeName: c.resumeName ?? "",

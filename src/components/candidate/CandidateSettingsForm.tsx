@@ -25,7 +25,9 @@ export default function CandidateSettingsForm({ profile }: { profile: CandidateP
   const [saved, setSaved] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [uploading, setUploading] = useState(false);
+  const [avatarUploading, setAvatarUploading] = useState(false);
   const resumeInput = useRef<HTMLInputElement>(null);
+  const avatarInput = useRef<HTMLInputElement>(null);
 
   const set = (patch: Partial<CandidateProfile>) => setForm({ ...form, ...patch });
 
@@ -48,6 +50,24 @@ export default function CandidateSettingsForm({ profile }: { profile: CandidateP
       setError(err instanceof Error ? err.message : "Failed.");
     } finally {
       setSaving(false);
+    }
+  };
+
+  const uploadAvatar = async (file: File) => {
+    setAvatarUploading(true);
+    setError(null);
+    const fd = new FormData();
+    fd.set("file", file);
+    try {
+      const res = await fetch("/api/candidate/avatar", { method: "POST", body: fd });
+      const json = await res.json();
+      if (!res.ok || !json.ok) throw new Error(json.error ?? "Upload failed.");
+      set({ avatarUrl: json.url });
+      router.refresh();
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed.");
+    } finally {
+      setAvatarUploading(false);
     }
   };
 
@@ -109,6 +129,44 @@ export default function CandidateSettingsForm({ profile }: { profile: CandidateP
             {saving ? "Saving…" : saved ? "Saved ✓" : "Save Changes"}
           </button>
         </div>
+        {/* Profile photo */}
+        <div className="flex items-center gap-4 mb-6">
+          <div className="relative">
+            {form.avatarUrl ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={form.avatarUrl} alt="Profile" className="w-20 h-20 rounded-full object-cover border border-[#e4bebc]" />
+            ) : (
+              <div className="w-20 h-20 rounded-full bg-primary/10 text-primary font-bold text-xl flex items-center justify-center">
+                {form.name
+                  .split(" ")
+                  .map((w) => w[0])
+                  .join("")
+                  .slice(0, 2)
+                  .toUpperCase() || "U"}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => avatarInput.current?.click()}
+              className="absolute -bottom-1 -right-1 w-8 h-8 bg-primary text-white rounded-full flex items-center justify-center shadow-md hover:brightness-110 active:scale-90 transition-all"
+              title="Change profile photo"
+            >
+              <span className="material-symbols-outlined text-[16px]">photo_camera</span>
+            </button>
+          </div>
+          <div>
+            <p className="text-sm font-semibold">{avatarUploading ? "Uploading…" : "Profile photo"}</p>
+            <p className="text-xs text-[#586158]">JPG or PNG, max 4MB. Shown to restaurants you apply to.</p>
+          </div>
+          <input
+            ref={avatarInput}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => e.target.files?.[0] && uploadAvatar(e.target.files[0])}
+          />
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <label className="text-xs font-bold text-[#586158] uppercase">Full Name</label>
