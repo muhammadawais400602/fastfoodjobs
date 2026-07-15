@@ -68,7 +68,36 @@ export default async function ApplyJobPage({ params }: Props) {
             </p>
           </div>
 
-          {existingChatUrl ? (
+          {!candidate ? (
+            <section className="bg-surface-container-lowest rounded-xl shadow-[0px_8px_30px_rgba(29,53,87,0.08)] border border-outline-variant/10 p-8 md:p-14 text-center animate-fade-in-up">
+              <div className="w-16 h-16 mx-auto mb-4 bg-primary-fixed text-primary rounded-full flex items-center justify-center">
+                <span className="material-symbols-outlined text-[36px]">lock_person</span>
+              </div>
+              <h2 className="text-2xl font-bold mb-2">
+                {session?.role === "restaurant" ? "Job seeker account needed" : "Sign in to apply"}
+              </h2>
+              <p className="text-on-surface-variant mb-8 max-w-md mx-auto">
+                {session?.role === "restaurant"
+                  ? "You're signed in as a restaurant. To apply for jobs, log in with a job seeker account."
+                  : "Create a free job seeker account (takes under a minute) to apply, track your applications, and chat with restaurants."}
+              </p>
+              <div className="flex flex-col sm:flex-row justify-center gap-3">
+                <Link
+                  href={`/login?next=/apply/job/${job.id}`}
+                  className="bg-primary text-on-primary px-8 py-3 rounded-lg text-sm font-semibold flex items-center justify-center gap-2 active:scale-[0.98] transition-all"
+                >
+                  <span className="material-symbols-outlined text-[18px]">login</span>
+                  Sign in or create account
+                </Link>
+                <Link
+                  href={`/j/${job.id}`}
+                  className="border border-outline text-on-surface px-8 py-3 rounded-lg text-sm font-semibold flex items-center justify-center"
+                >
+                  Back to the job
+                </Link>
+              </div>
+            </section>
+          ) : existingChatUrl ? (
             <section className="bg-surface-container-lowest rounded-xl shadow-[0px_8px_30px_rgba(29,53,87,0.08)] border border-outline-variant/10 p-8 md:p-14 text-center animate-fade-in-up">
               <div className="w-16 h-16 mx-auto mb-4 bg-primary-fixed text-primary rounded-full flex items-center justify-center">
                 <span className="material-symbols-outlined text-[36px]">how_to_reg</span>

@@ -78,14 +78,20 @@ export default function ApplicationForm({
                   Email Address
                 </label>
                 <input
-                  className="h-12 px-4 rounded-lg border border-outline/30 bg-surface-bright text-base outline-none focus:border-secondary-container focus:border-2 transition-all"
+                  className={`h-12 px-4 rounded-lg border border-outline/30 text-base outline-none focus:border-secondary-container focus:border-2 transition-all ${
+                    defaultEmail ? "bg-surface-container text-on-surface-variant cursor-not-allowed" : "bg-surface-bright"
+                  }`}
                   id="email"
                   name="email"
                   placeholder="john@example.com"
                   defaultValue={defaultEmail}
+                  readOnly={Boolean(defaultEmail)}
                   required
                   type="email"
                 />
+                {defaultEmail && (
+                  <p className="text-xs text-on-surface-variant">Applications are sent from your account email.</p>
+                )}
               </div>
             </div>
 

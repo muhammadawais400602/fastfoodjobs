@@ -3,6 +3,7 @@ import { Binary, ObjectId } from "mongodb";
 import { getDb } from "@/lib/mongodb";
 import { rateLimit, clientIp } from "@/lib/ratelimit";
 import { notifyRestaurantNewApplication } from "@/lib/email";
+import { getSession } from "@/lib/auth";
 
 const MAX_CV_BYTES = 5 * 1024 * 1024;
 const ALLOWED_CV_TYPES = [
@@ -18,10 +19,20 @@ export async function POST(request: Request) {
       { status: 429 }
     );
   }
+  // Applying requires a job-seeker account — the application is tied to it.
+  const session = await getSession();
+  if (!session || session.role !== "candidate") {
+    return NextResponse.json(
+      { ok: false, error: "Please sign in as a job seeker to apply." },
+      { status: 401 }
+    );
+  }
+
   const formData = await request.formData();
 
   const fullName = String(formData.get("full_name") ?? "").trim();
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  // Identity comes from the account, not the form — one account, one application per job.
+  const email = session.email.toLowerCase();
   const phone = String(formData.get("phone") ?? "").trim();
   const motivation = String(formData.get("motivation") ?? "").trim();
   const jobSlug = String(formData.get("job_slug") ?? "").trim();
